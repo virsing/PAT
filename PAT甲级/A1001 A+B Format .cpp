@@ -15,9 +15,8 @@ Sample Output
 参考代码：
 
 #include<cstdio>
-
 #include<iostream>
-
+#include<algorithm>
 #include<string>
 
 using namespace std;
