@@ -44,7 +44,7 @@ const int inf=(1<<31)-2;
 
 int n,m,st,ed;
 
-int d[maxn],weight[maxn],num[maxn]={0},w[maxn]={0};
+int d[maxn],weight[maxn],num[maxn]={0},w[maxn]={0};//分别存储最短路径条数，每个城市点权，最短路径数量，路径上收集到的点权最大值
 
 bool vis[maxn]={false};
 
@@ -52,7 +52,7 @@ struct node{
 
 	int v,dis;
 
-	node(int _v=0,int _dis=0):v(_v),dis(_dis){}
+	node(int _v=0,int _dis=0):v(_v),dis(_dis){} //构造函数
 
 };
 
@@ -112,11 +112,11 @@ void dijkstra(int s){
 
 				{
 
-					if(w[u]+weight[v]>w[v])
+					if(w[u]+weight[v]>w[v]) 
 
 						w[v]=w[u]+weight[v];
 
-					num[v]+=num[u];
+					num[v]+=num[u]; //不论上面点权判断是否成立，这句必须执行
 
 				}
 
