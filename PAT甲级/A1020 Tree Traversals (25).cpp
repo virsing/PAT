@@ -109,3 +109,67 @@ int main()
 	return 0;
 
 }
+优化：在使用中序和后序建树的过程中，每层节点都是按照从左往右的顺序依次访问，因此开设一个数组下表作为层号，将建树过程每次访问的结点依次加入，最后按层号输出即为层序遍历。
+参考代码：
+
+#include<cstdio>
+
+using namespace std;
+
+const int maxn=35;
+
+vector<int> in(maxn),post(maxn);
+
+vector<int> level[maxn];
+
+void Create(int inl,int inr,int postl,int postr,int d)
+
+{
+
+	if(postl>postr) return ;
+
+	level[d].push_back(post[postr]);
+
+	int k=inl;
+
+	while(k<=inr&&in[k]!=post[postr]) k++;
+
+	int numleft=k-inl;
+
+	Create(inl,k-1,postl,postl+numleft-1,d+1);
+
+	Create(k+1,inr,postl+numleft,postr-1,d+1);
+
+}
+
+int main()
+
+{
+
+	int n;
+
+	scanf("%d",&n);
+
+	for(int i=0;i<n;i++) scanf("%d",&post[i]);
+
+	for(int i=0;i<n;i++) scanf("%d",&in[i]);
+
+	Create(0,n-1,0,n-1,1);
+
+	printf("%d",level[1][0]);
+
+	for(int i=2;i<maxn;i++){
+
+		for(int j=0;j<level[i].size();j++){
+
+			printf(" %d",level[i][j]);
+
+		}
+
+	}
+
+	printf("\n");
+
+	return 0;
+
+}
