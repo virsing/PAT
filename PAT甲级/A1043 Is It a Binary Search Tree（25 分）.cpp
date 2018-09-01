@@ -1,4 +1,4 @@
-043 Is It a Binary Search Tree（25 分）
+1043 Is It a Binary Search Tree（25 分）
 A Binary Search Tree (BST) is recursively defined as a binary tree which has the following properties:
 The left subtree of a node contains only nodes with keys less than the node's key.
 The right subtree of a node contains only nodes with keys greater than or equal to the node's key.
@@ -37,7 +37,7 @@ Sample Input 3:
 Sample Output 3:
 NO
 题意：给定n个数字问你它是否为二叉排序树的先序序列，或者镜像二叉排序树（即交换二叉排序树所有结点的左右子树）的先序序列，如果是则输出YES，然后输出对应的后序遍历序列或镜像后序遍历序列，否则输出NO。
-思路：按题意写出二叉排序树的建立函数，再分别写出二叉树的前序遍历函数preOrder，镜像前序遍历函数MpreOrder，后序遍历函数postOrder以及镜像后序遍历函数MpostOrder。然后根据要求判断并输出即可。注意镜像函数只需交换左右子树的访问顺序即可。
+思路：按题意写出二叉排序树的建立函数，再分别写出二叉树的前序遍历函数preOrder，镜像前序遍历函数MpreOrder，后序遍历函数postOrder以及镜像后序遍历函数MpostOrder。然后把前序遍历结果和镜像前序遍历结果与原始序列比较，根据是否相同判断并对应输出后序或镜像后序序列即可。注意镜像函数只需交换左右子树的访问顺序即可。
 参考代码：
 
 #include<vector>
