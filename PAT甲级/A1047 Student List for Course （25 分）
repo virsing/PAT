@@ -1,0 +1,54 @@
+Zhejiang University has 40,000 students and provides 2,500 courses. Now given the registered course list of each student, you are supposed to output the student name lists of all the courses.
+
+Input Specification:
+
+Each input file contains one test case. For each case, the first line contains 2 numbers: N (≤40,000), the total number of students, and K (≤2,500), the total number of courses. Then N lines follow, each contains a student's name (3 capital English letters plus a one-digit number), a positive number C (≤20) which is the number of courses that this student has registered, and then followed by C course numbers. For the sake of simplicity, the courses are numbered from 1 to K.
+
+Output Specification:
+
+For each test case, print the student name lists of all the courses in increasing order of the course numbers. For each course, first print in one line the course number and the number of registered students, separated by a space. Then output the students' names in alphabetical order. Each name occupies a line.
+
+Sample Input:
+
+10 5ZOE1 2 4 5ANN0 3 5 2 1BOB5 5 3 4 2 1 5JOE4 1 2JAY9 4 1 2 5 4FRA8 3 4 2 5DON2 2 4 5AMY7 1 5KAT3 3 5 4 2LOR6 4 2 4 1 5
+
+Sample Output:
+
+1 4ANN0BOB5JAY9LOR62 7ANN0BOB5FRA8JAY9JOE4KAT3LOR63 1BOB54 7BOB5DON2FRA8JAY9KAT3LOR6ZOE15 9AMY7ANN0BOB5DON2FRA8JAY9KAT3LOR6ZOE1
+
+题意：给定n个学生和m门课程，以及这n个学生的选课情况，让你按顺序列出选修每门课程的学生总人数和姓名。
+
+思路：学生姓名如果使用string会有一组数据超时，因此使用数组name[]存储姓名，并完成学生姓名与index的映射，以简化存储。在建立一个vector数组course[]完成课程编号与所选修学生编号的映射，然后把每门课程的学生index存入课程的数组中，最后输出即可。注意输出时姓名要按字母顺序 ，因此需要排序。
+
+参考代码：
+--------------------- 
+#include<cstdio>
+#include<vector>
+#include<cstring>
+#include<algorithm>
+using namespace std;
+char name[40010][5];
+bool cmp(int i,int j){
+	return strcmp(name[i],name[j])<0;
+}
+vector<int> course[2510];
+int main()
+{
+	int n,k,id,num;
+	scanf("%d%d",&n,&k);
+	for(int i=0;i<n;i++){
+		scanf("%s %d",name[i],&num);
+		for(int j=0;j<num;j++){
+			scanf("%d",&id);
+			course[id].push_back(i);
+		}
+	}
+	for(int i=1;i<=k;i++){
+		printf("%d %d\n",i,course[i].size());
+		sort(course[i].begin(),course[i].end(),cmp);
+		for(auto it=course[i].begin();it!=course[i].end();it++){
+			printf("%s\n",name[*it]);
+		}
+	}
+	return 0;
+}
