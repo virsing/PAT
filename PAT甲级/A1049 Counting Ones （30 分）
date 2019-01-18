@@ -1,0 +1,54 @@
+The task is simple: given any positive integer N, you are supposed to count the total number of 1's in the decimal form of the integers from 1 to N. For example, given N being 12, there are five 1's in 1, 10, 11, and 12.
+
+Input Specification:
+
+Each input file contains one test case which gives the positive N (≤2​30​​).
+
+Output Specification:
+
+For each test case, print the number of 1's in one line.
+
+Sample Input:
+
+12
+
+
+Sample Output:
+
+5
+
+
+题意：给定一个数n，让你数出从1到n所有数字中‘1’出现的次数。
+
+思路：依次算出n的个位十位百位等每个位置上1的个数累加即可。每个位置上1的次数与当前位cur及高位部分high及低位部分low都有关系，同时当前位cur为0，1及其他情况1出现的次数也不同。
+
+          例如n=256时，个位上1出现26次 。十位上1出现：2*10+10=30次，百位上1出现：1*100=100次；
+
+当n=216时，十位上，当前位cur=1，high=2，low=6，此时十位上出现次数为high*10+low+1
+
+当n=206时，十位上，当前位cur=0，high=2，low=6，此时十位上出现次数为high*10；
+
+参考代码：
+--------------------- 
+#include<cstdio>
+using namespace std;
+int solve(int n){
+	int cnt=0,factor=1;
+	while(n/factor>0){
+		int high=n/(factor*10);
+		int low=n-n/factor*factor;
+		int cur=n/factor%10;		//求当前位的数字
+		if(cur==0) cnt+=high*factor;
+		else if(cur==1) cnt+=high*factor+low+1;
+		else cnt+=high*factor+factor;
+		factor*=10;
+	}
+	return cnt;
+}
+int main()
+{
+	int n;
+	scanf("%d",&n);
+	printf("%d\n",solve(n));
+	return 0;
+}
