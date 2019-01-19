@@ -1,0 +1,52 @@
+Given a stack which can keep M numbers at most. Push N numbers in the order of 1, 2, 3, ..., N and pop randomly. You are supposed to tell if a given sequence of numbers is a possible pop sequence of the stack. For example, if M is 5 and N is 7, we can obtain 1, 2, 3, 4, 5, 6, 7 from the stack, but not 3, 2, 1, 7, 5, 6, 4.
+
+Input Specification:
+
+Each input file contains one test case. For each case, the first line contains 3 numbers (all no more than 1000): M (the maximum capacity of the stack), N (the length of push sequence), and K (the number of pop sequences to be checked). Then K lines follow, each contains a pop sequence of N numbers. All the numbers in a line are separated by a space.
+
+Output Specification:
+
+For each pop sequence, print in one line "YES" if it is indeed a possible pop sequence of the stack, or "NO" if not.
+
+Sample Input:
+
+5 7 51 2 3 4 5 6 73 2 1 7 5 6 47 6 5 4 3 2 15 6 4 3 7 2 11 7 6 5 4 3 2
+
+Sample Output:
+
+YESNONOYESNO
+
+ 题意：给出一个栈容量是m，再给出一个数字n，入栈顺序是1，2，3，，，n，再给出k个序列，问你能否得到这个出栈序列。
+
+思路：直接模拟这个过程，首先把出栈序列输入到数组中，然后模拟入栈，并判断是否和出栈序列相等，当且仅当这个过程中栈的大小不超过m并且最终栈空才输出YES。
+
+参考代码：
+--------------------- 
+#include<cstdio>
+#include<stack>
+#include<vector>
+using namespace std;
+int main()
+{
+	int n,m,q;
+	scanf("%d%d%d",&m,&n,&q);
+	vector<int> v(n);
+	for(int k=0;k<q;k++){
+		for(int i=0;i<n;i++)
+			scanf("%d",&v[i]);
+		int l=0;
+		bool flag=true;	//判断栈的容量是否超过m
+		stack<int> s;
+		for(int i=1;i<=n&&flag;i++){
+			s.push(i);
+			if(s.size()>m) 
+				flag=false;
+			while(s.size()>0&&s.top()==v[l]) {
+				s.pop();l++;
+			}
+		}
+		if(flag&&s.size()==0) printf("YES\n");
+		else printf("NO\n");
+	}
+	return 0;
+}
