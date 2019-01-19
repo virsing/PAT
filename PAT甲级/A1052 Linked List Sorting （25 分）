@@ -1,0 +1,70 @@
+A linked list consists of a series of structures, which are not necessarily adjacent in memory. We assume that each structure contains an integer key and a Next pointer to the next structure. Now given a linked list, you are supposed to sort the structures according to their key values in increasing order.
+
+Input Specification:
+
+Each input file contains one test case. For each case, the first line contains a positive N (<10​5​​) and an address of the head node, where N is the total number of nodes in memory and the address of a node is a 5-digit positive integer. NULL is represented by −1.
+
+Then N lines follow, each describes a node in the format:
+
+Address Key Next
+
+
+where Address is the address of the node in memory, Key is an integer in [−10​5​​,10​5​​], and Next is the address of the next node. It is guaranteed that all the keys are distinct and there is no cycle in the linked list starting from the head node.
+
+Output Specification:
+
+For each test case, the output format is the same as that of the input, where N is the total number of nodes in the list and all the nodes must be sorted order.
+
+Sample Input:
+
+5 0000111111 100 -100001 0 2222233333 100000 1111112345 -1 3333322222 1000 12345
+
+Sample Output:
+
+5 1234512345 -1 0000100001 0 1111111111 100 2222222222 1000 3333333333 100000 -1
+
+题意：给定一组n个链表数据，起始地址为st，格式为： 地址，数据，下一个地址。让你把链表中数据按从小到大排序输出。
+
+思路：由于所给的数据有些不在链表上，因此需要遍历一遍链表标记出哪些在链表上，然后对有效数据排序输出。如果遍历一遍过后有效数据为0，需要特殊判断输出。
+
+参考代码：
+--------------------- 
+#include<cstdio>
+#include<vector>
+#include<algorithm>
+using namespace std;
+struct node{
+	int data,addr,next,flag;
+	node():flag(0){}
+}v[100010];
+bool cmp(node a,node b){
+	if(a.flag&&b.flag) return a.data<b.data;
+	else return a.flag>b.flag;
+}
+int main()
+{
+	int n,st,addr,next,p,cnt=0;
+	scanf("%d%d",&n,&st);
+	for(int i=0;i<n;i++){
+		scanf("%d",&addr);
+		scanf("%d%d",&v[addr].data,&v[addr].next);
+		v[addr].addr=addr;
+	}
+	p=st;
+	while(p!=-1){	//遍历链表
+		v[p].flag=1;
+		p=v[p].next;
+		cnt++;
+	}
+	sort(v,v+100010,cmp);
+	if(cnt==0) printf("0 -1\n");
+	else{
+		printf("%d %05d\n",cnt,v[0].addr);
+		printf("%05d %d",v[0].addr,v[0].data);
+		for(int i=1;i<cnt;i++){
+			printf(" %05d\n%05d %d",v[i].addr,v[i].addr,v[i].data);
+		}
+		printf(" -1\n");
+	}
+	return 0;
+}
