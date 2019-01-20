@@ -1,0 +1,66 @@
+Forbes magazine publishes every year its list of billionaires based on the annual ranking of the world's wealthiest people. Now you are supposed to simulate this job, but concentrate only on the people in a certain range of ages. That is, given the net worths of N people, you must find the M richest people in a given range of their ages.
+
+Input Specification:
+
+Each input file contains one test case. For each case, the first line contains 2 positive integers: N (≤10​5​​) - the total number of people, and K (≤10​3​​) - the number of queries. Then N lines follow, each contains the name (string of no more than 8 characters without space), age (integer in (0, 200]), and the net worth (integer in [−10​6​​,10​6​​]) of a person. Finally there are K lines of queries, each contains three positive integers: M (≤100) - the maximum number of outputs, and [Amin, Amax] which are the range of ages. All the numbers in a line are separated by a space.
+
+Output Specification:
+
+For each query, first print in a line Case #X: where X is the query number starting from 1. Then output the M richest people with their ages in the range [Amin, Amax]. Each person's information occupies a line, in the format
+
+Name Age Net_Worth
+
+
+The outputs must be in non-increasing order of the net worths. In case there are equal worths, it must be in non-decreasing order of the ages. If both worths and ages are the same, then the output must be in non-decreasing alphabetical order of the names. It is guaranteed that there is no two persons share all the same of the three pieces of information. In case no one is found, output None.
+
+Sample Input:
+
+12 4Zoe_Bill 35 2333Bob_Volk 24 5888Anny_Cin 95 999999Williams 30 -22Cindy 76 76000Alice 18 88888Joe_Mike 32 3222Michael 5 300000Rosemary 40 5888Dobby 24 5888Billy 24 5888Nobody 5 04 15 454 30 354 5 951 45 50
+
+Sample Output:
+
+Case #1:Alice 18 88888Billy 24 5888Bob_Volk 24 5888Dobby 24 5888Case #2:Joe_Mike 32 3222Zoe_Bill 35 2333Williams 30 -22Case #3:Anny_Cin 95 999999Michael 5 300000Alice 18 88888Cindy 76 76000Case #4:None
+
+题意：给定n个人的姓名，年龄，财富净值，让你仿照福布斯排行榜，给特定年龄段的人按财富净值排序输出，如果财富净值相同按年龄升序排列，如果年龄也相同按姓名字母顺序排列，题目保证唯一。 
+
+思路：由于数据量较大，时间限制较少，因此姓名使用字符数组存储，首先对所有人进行一次排序，然后根据问题要求，遍历一次排行榜，把符合年龄要求的人员输出，直到输出人员满足要求或者遍历完成。如果整个遍历过程没有一个符合要求则输出“None”。
+
+参考代码：
+--------------------- 
+#include<cstdio>
+#include<vector>
+#include<algorithm>
+using namespace std;
+struct node{
+	char name[10];
+	int age,Net_Worth;
+};
+bool cmp(node a,node b){
+	if(a.Net_Worth!=b.Net_Worth) return a.Net_Worth>b.Net_Worth;
+	else if(a.age!=b.age) return a.age<b.age;
+	else return strcmp(a.name,b.name)<0;
+}
+int main()
+{
+	int n,k,M,Amin,Amax;
+	scanf("%d%d",&n,&k);
+	vector<node> v(n);
+	for(int i=0;i<n;i++){
+		scanf("%s %d %d",&v[i].name,&v[i].age,&v[i].Net_Worth);
+	}
+	sort(v.begin(),v.end(),cmp);
+	for(int i=1;i<=k;i++){
+		scanf("%d %d %d",&M,&Amin,&Amax);
+		int cnt=0;		//cnt统计实际输出人数
+		printf("Case #%d:\n",i);
+		for(int j=0;j<v.size()&&M;j++){
+			if(v[j].age>=Amin&&v[j].age<=Amax){
+				printf("%s %d %d\n",v[j].name,v[j].age,v[j].Net_Worth);
+				M--;
+				cnt++;
+			}
+		}
+		if(cnt==0) printf("None\n");
+	}
+	return 0;
+}
