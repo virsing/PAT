@@ -1,0 +1,92 @@
+If a machine can save only 3 significant digits, the float numbers 12300 and 12358.9 are considered equal since they are both saved as 0.123×10​5​​ with simple chopping. Now given the number of significant digits on a machine and two float numbers, you are supposed to tell if they are treated equal in that machine.
+
+Input Specification:
+
+Each input file contains one test case which gives three numbers N, A and B, where N (<100) is the number of significant digits, and A and B are the two float numbers to be compared. Each float number is non-negative, no greater than 10​100​​, and that its total digit number is less than 100.
+
+Output Specification:
+
+For each test case, print in a line YES if the two numbers are treated equal, and then the number in the standard form 0.d[1]...d[N]*10^k (d[1]>0 unless the number is 0); or NO if they are not treated equal, and then the two numbers in their standard form. All the terms must be separated by a space, with no extra space at the end of a line.
+
+Note: Simple chopping is assumed without rounding.
+
+Sample Input 1:
+
+3 12300 12358.9
+
+
+Sample Output 1:
+
+YES 0.123*10^5
+
+
+Sample Input 2:
+
+3 120 128
+
+
+Sample Output 2:
+
+NO 0.120*10^3 0.128*10^3
+
+
+题意：给出两个浮点数，再给出保留的有效位数n，问你这两个数字在保留n位有效数字情况下是否相等， 如果相等输出YES，并按照格式输出，如果不等输出NO，并按格式输出这两个数字。
+
+思路：
+
+注意：题目所给数字不一定标准，可能包含前导0，如00.123或000134等，因此需要先去除前导0,然后分类讨论。
+
+1.将浮点数按照是否含小数点分两类：1）xxxx，2）xxx.xxxx。首先找出小数点在这个字符串中的位置，如果小数点位置pos==s的末尾，说明是第一种情况，这是指数exp=s.size(),特殊情况下如0也符合。
+
+2.如果小数点pos不在末尾，说明是第二种情况，此时又分混合数和纯小数。①xxx.xxx，②0.xxx。在去除前导零后，如果s[0]是小数点，说明是第②种情况，否则是第①种。对于第一种，小数点位置pos即为指数exp，对于第二种小数点后可能包含0，因此需要找到小数点后第一个非零数，并且每遇到一个零都需要让exp-1，如果是小数点后全零的情况，如0.0000，则需要注意令exp=0。
+
+参考代码：
+--------------------- 
+#include<cstdio>
+#include<string>
+#include<iostream>
+using namespace std;
+int n;
+string normalize(string s){
+	int exp=0,pos=0;
+	while(s.size()>0&&s[0]=='0') s.erase(s.begin());	//去除前导0
+	while(pos<s.size()&&s[pos]!='.') pos++;
+	if(pos==s.size()) {	//纯整数情况，没有小数点
+			exp=s.size();	
+	}else{
+		if(s[0]!='.'){	//xxx.xxx，整数小数均存在
+			exp=pos;
+			s.erase(s.begin()+pos);
+		}else {			//形如0.xxx的纯小数,去前导后为：.xxx
+			s.erase(s.begin());		//去掉小数点
+			while(s.size()>0&&s[0]=='0') {
+				exp--;
+				s.erase(s.begin());
+			}
+			if(s.size()==0) exp=0;	//全零情况如0.000，处理后为空串
+		}
+	}
+	string ans="0.";
+	if(s.size()>=n)
+		ans+=s.substr(0,n);
+	else{
+		ans+=s;
+		for(int i=0;i<n-s.size();i++)
+			ans+='0';
+	}
+	ans+="*10^";
+	ans+=to_string((long long)exp);
+	return ans;
+}
+int main()
+{
+	string s1,s2;
+	cin>>n>>s1>>s2;
+	s1=normalize(s1);
+	s2=normalize(s2);
+	if(s1==s2) cout<<"YES "<<s1<<endl;
+	else {
+		cout<<"NO "<<s1<<" "<<s2<<endl;
+	}
+	return 0;
+}
