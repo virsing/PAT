@@ -1,0 +1,73 @@
+About 900 years ago, a Chinese philosopher Sima Guang wrote a history book in which he talked about people's talent and virtue. According to his theory, a man being outstanding in both talent and virtue must be a "sage（圣人）"; being less excellent but with one's virtue outweighs talent can be called a "nobleman（君子）"; being good in neither is a "fool man（愚人）"; yet a fool man is better than a "small man（小人）" who prefers talent than virtue.
+
+Now given the grades of talent and virtue of a group of people, you are supposed to rank them according to Sima Guang's theory.
+
+Input Specification:
+
+Each input file contains one test case. Each case first gives 3 positive integers in a line: N (≤10​5​​), the total number of people to be ranked; L (≥60), the lower bound of the qualified grades -- that is, only the ones whose grades of talent and virtue are both not below this line will be ranked; and H (<100), the higher line of qualification -- that is, those with both grades not below this line are considered as the "sages", and will be ranked in non-increasing order according to their total grades. Those with talent grades below H but virtue grades not are cosidered as the "noblemen", and are also ranked in non-increasing order according to their total grades, but they are listed after the "sages". Those with both grades below H, but with virtue not lower than talent are considered as the "fool men". They are ranked in the same way but after the "noblemen". The rest of people whose grades both pass the L line are ranked after the "fool men".
+
+Then N lines follow, each gives the information of a person in the format:
+
+ID_Number Virtue_Grade Talent_Grade
+
+
+where ID_Number is an 8-digit number, and both grades are integers in [0, 100]. All the numbers are separated by a space.
+
+Output Specification:
+
+The first line of output must give M (≤N), the total number of people that are actually ranked. Then M lines follow, each gives the information of a person in the same format as the input, according to the ranking rules. If there is a tie of the total grade, they must be ranked with respect to their virtue grades in non-increasing order. If there is still a tie, then output in increasing order of their ID's.
+
+Sample Input:
+
+14 60 8010000001 64 9010000002 90 6010000011 85 8010000003 85 8010000004 80 8510000005 82 7710000006 83 7610000007 90 7810000008 75 7910000009 59 9010000010 88 4510000012 80 10010000013 90 9910000014 66 60
+
+Sample Output:
+
+1210000013 90 9910000012 80 10010000003 85 8010000011 85 8010000004 80 8510000007 90 7810000006 83 7610000005 82 7710000002 90 6010000014 66 6010000008 75 7910000001 64 90
+
+题意：给定一组n个人，格式为：id，道德分，才能分。让你按要求排序输出。
+
+思路：由于排序规则有四种，因此在输入时按要求对类别分类，然后再排序。
+
+参考代码：
+--------------------- 
+#include<cstdio>
+#include<vector>
+#include<algorithm>
+using namespace std;
+struct node{
+	int id,talent,virtue,tag;
+	node(int a,int b,int c,int d):id(a),virtue(b),talent(c),tag(d){}
+};
+bool cmp(node a,node b){
+	if(a.tag!=b.tag) 
+		return a.tag>b.tag;
+	else if(a.talent+a.virtue!=b.talent+b.virtue)
+		return a.talent+a.virtue>b.talent+b.virtue;
+	else if(a.talent+a.virtue==b.talent+b.virtue&&a.virtue!=b.virtue)
+		return a.virtue>b.virtue;
+	else 
+		return a.id<b.id;
+}
+int main()
+{
+	int n,l,h,id,v,t,tag;
+	vector<node> ans;
+	scanf("%d %d %d",&n,&l,&h);
+	for(int i=0;i<n;i++){
+		scanf("%d %d %d",&id,&v,&t);
+		if(v>=l&&t>=l){
+			if(v>=h&&t>=h) tag=4;
+			else if(v>=h&&t<h) tag=3;
+			else if(v<h&&t<h&&v>=t) tag=2;
+			else tag=1;
+			ans.push_back(node(id,v,t,tag));
+		}
+	}
+	sort(ans.begin(),ans.end(),cmp);
+	printf("%d\n",ans.size());
+	for(int i=0;i<ans.size();i++){
+		printf("%08d %d %d\n",ans[i].id,ans[i].virtue,ans[i].talent);
+	}
+	return 0;
+}
