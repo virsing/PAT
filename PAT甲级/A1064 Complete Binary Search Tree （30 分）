@@ -95,3 +95,46 @@ int main()
 	LevelBFS(root,n);
 	return 0;
 }
+
+思路2： 使用数组存储该完全BST树，则结点之间满足关系，若当前结点i，则左孩子2*i+1，右孩子2*i+2。对给定的数组排序得中序遍历序列，然后中序遍历
+该完全BST树，把数据填入树中，最后层序遍历输出。
+
+参考代码：
+
+#include<cstdio>
+#include<queue>
+#include<vector>
+#include<algorithm>
+using namespace std;
+int n,k=0;
+void inorder(vector<int> a,vector<int>& T,int d){
+	if(d<n){
+		inorder(a,T,2*d+1);
+		T[d]=a[k++];
+		inorder(a,T,2*d+2);
+	}
+}
+void levelBFS(vector<int> T,int root){
+	queue<int> q;
+	q.push(root);
+	while(!q.empty()){
+		int p=q.front();
+		q.pop();
+		if(p!=0) printf(" ");
+		printf("%d",T[p]);
+		if(2*p+1<n) q.push(2*p+1);
+		if(2*p+2<n) q.push(2*p+2);
+	}
+}
+int main()
+{
+	scanf("%d",&n);
+	vector<int> a(n),T(n);
+	for(int i=0;i<n;i++)
+		scanf("%d",&a[i]);
+	sort(a.begin(),a.end());
+	inorder(a,T,0);
+	levelBFS(T,0);
+	return 0;
+}
+
