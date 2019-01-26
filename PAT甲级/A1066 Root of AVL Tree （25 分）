@@ -1,0 +1,133 @@
+An AVL tree is a self-balancing binary search tree. In an AVL tree, the heights of the two child subtrees of any node differ by at most one; if at any time they differ by more than one, rebalancing is done to restore this property. Figures 1-4 illustrate the rotation rules.
+
+ 
+Now given a sequence of insertions, you are supposed to tell the root of the resulting AVL tree.
+
+
+Input Specification:
+
+Each input file contains one test case. For each case, the first line contains a positive integer N (≤20) which is the total number of keys to be inserted. Then N distinct integer keys are given in the next line. All the numbers in a line are separated by a space.
+
+Output Specification:
+
+For each test case, print the root of the resulting AVL tree in one line.
+
+Sample Input 1:
+
+588 70 61 96 120
+
+Sample Output 1:
+
+70
+
+
+Sample Input 2:
+
+788 70 61 96 120 90 65
+
+Sample Output 2:
+
+88
+
+
+题意：给出一个数组，让你建立一棵AVL树，并输出根节点的值。
+
+思路：二叉树的结点结构如下 
+
+struct node{
+	int v,height;	//结点权值和高度
+	node* lchild;
+	node* rchild;
+	node(int _v,int _h=1,node* l=NULL,node* r=NULL):v(_v),height(_h),lchild(l),rchild(r){}
+};
+
+设结点平衡因子为当前结点左孩子高度-右孩子结点高度。根据当前结点root的平衡因子和root的左右孩子平衡因子情况分四种情况。
+
+平衡因子值
+			 
+		root=2，root->lchild=1
+			右旋（root）
+		root=2,  root->lchild=-1
+			左旋(root->lchild),右旋(root)
+		root=-2, root->rchild=-1
+			左旋（root）
+		root=-2, root->rchild=1
+			右旋（root->rchild)，左旋(root)
+		
+ 参考代码：
+--------------------- 
+#include<cstdio>
+#include<algorithm>
+using namespace std;
+struct node{
+	int v,height;	//结点权值和高度
+	node* lchild;
+	node* rchild;
+	node(int _v,int _h=1,node* l=NULL,node* r=NULL):v(_v),height(_h),lchild(l),rchild(r){}
+};
+int n,t;
+int getHeight(node* root){
+	if(root==NULL) return 0;
+	else return root->height;
+}
+void updateHeight(node* root){
+	root->height=max(getHeight(root->lchild),getHeight(root->rchild))+1;
+}
+int getBalanceFactor(node* root){
+	return getHeight(root->lchild)-getHeight(root->rchild);
+}
+void L(node*& root){
+	node* temp=root->rchild;
+	root->rchild=temp->lchild;
+	temp->lchild=root;
+	updateHeight(root);
+	updateHeight(temp);
+	root=temp;
+}
+void R(node*& root){
+	node* temp=root->lchild;
+	root->lchild=temp->rchild;
+	temp->rchild=root;
+	updateHeight(root);
+	updateHeight(temp);
+	root=temp;
+}
+void insert(node*& root,int v){
+	if(root==NULL){
+		root=new node(v);
+		return;
+	}else if(v<root->v){
+		insert(root->lchild,v);
+		updateHeight(root);	//插入完成后要更新根结点高度
+		if(getBalanceFactor(root)==2){
+			if(getBalanceFactor(root->lchild)==1)
+				R(root);
+			else{
+				L(root->lchild);
+				R(root);
+			}
+		}
+	}else {
+		insert(root->rchild,v);
+		updateHeight(root);		//更新高度
+		if(getBalanceFactor(root)==-2){
+			if(getBalanceFactor(root->rchild)==-1)
+				L(root);
+			else{
+				R(root->rchild);
+				L(root);
+			}
+		}
+	}
+}
+int main()
+{
+	scanf("%d",&n);
+	node* root=NULL;
+	for(int i=0;i<n;i++){
+		scanf("%d",&t);
+		insert(root,t);
+	}
+	printf("%d\n",root->v);
+	return 0;
+}
