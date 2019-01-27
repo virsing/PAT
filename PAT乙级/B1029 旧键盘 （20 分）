@@ -1,0 +1,50 @@
+旧键盘上坏了几个键，于是在敲一段文字的时候，对应的字符就不会出现。现在给出应该输入的一段文字、以及实际被输入的文字，请你列出肯定坏掉的那些键。
+
+输入格式：
+
+输入在 2 行中分别给出应该输入的文字、以及实际被输入的文字。每段文字是不超过 80 个字符的串，由字母 A-Z（包括大、小写）、数字 0-9、以及下划线 _（代表空格）组成。题目保证 2 个字符串均非空。
+
+输出格式：
+
+按照发现顺序，在一行中输出坏掉的键。其中英文字母只输出大写，每个坏键只输出一次。题目保证至少有 1 个坏键。
+
+输入样例：
+
+7_This_is_a_test_hs_s_a_es
+
+输出样例：
+
+7TI
+
+
+思路：首先对第一个字符串做哈希表，按顺序标记出出现的字符， 然后把在第二个字符串中出现过的字符剔除掉，最后输出即可。注意不能使用unordered_map，因为unordered_map在访问时不一定与原来插入顺序相同。
+
+参考代码：
+--------------------- 
+#include<vector>
+#include<string>
+#include<iostream>
+using namespace std;
+int hasht[200];
+int main()
+{
+	string a,b;
+	vector<char> v; 
+	cin>>a>>b;
+	for(int i=0;i<a.size();i++){
+		if(a[i]>='a'&&a[i]<='z') a[i]='A'+a[i]-'a';
+		hasht[a[i]]=1;
+		v.push_back(a[i]);
+	}
+	for(int i=0;i<b.size();i++){
+		if(b[i]>='a'&&b[i]<='z') b[i]='A'+b[i]-'a';
+		hasht[b[i]]=0;
+	}	
+	for(int i=0;i<v.size();i++)
+		if(hasht[v[i]]==1){
+			cout<<v[i];
+			hasht[v[i]]=0;	//每个字符只输出一次
+		}
+	cout<<endl;
+	return 0;
+}
