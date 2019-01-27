@@ -1,0 +1,54 @@
+给定一个正整数数列，和正整数 p，设这个数列中的最大值是 M，最小值是 m，如果 M≤mp，则称这个数列是完美数列。
+
+现在给定参数 p 和一些正整数，请你从中选择尽可能多的数构成一个完美数列。
+
+输入格式：
+
+输入第一行给出两个正整数 N 和 p，其中 N（≤10​5​​）是输入的正整数的个数，p（≤10​9​​）是给定的参数。第二行给出 N 个正整数，每个数不超过 10​9​​。
+
+输出格式：
+
+在一行中输出最多可以选择多少个数可以用它们组成一个完美数列。
+
+输入样例：
+
+10 82 3 20 4 5 1 6 7 8 9
+
+输出样例：
+
+8
+
+
+思路：首先对数组排序，则最小的数在左边，最大的数在右边，对于每一个a[i]，使用二分查找的方式 找出第一个不满足小于等于a[i]*p的数，则对应的完美数列长度就是当前下标-i。找出最大长度即可。因为可能整个数组都符合要求，二分查找右边界为n。另外注意，如果使用vector<int>会超时，使用a[100010]数组则不会。看来对于大量数据数组要节省不少时间。
+
+参考代码：
+--------------------- 
+#include<cstdio>
+#include<algorithm>
+using namespace std;
+const int maxn=100010;
+int n,p,a[maxn];
+int count(int left,int right,long long np){
+	int l=left,r=right,mid;
+	while(l<r){
+		mid=(l+r)/2;
+		if(a[mid]<=np) l=mid+1; 
+		else r=mid;
+	}
+	return l-left;
+}
+int main()
+{
+	int t=0,cnt=0;
+	scanf("%d%d",&n,&p);
+	for(int i=0;i<n;i++)
+		scanf("%d",&a[i]);
+	sort(a,a+n);
+	for(int i=0;i<n;i++){
+		t=count(i,n,(long long)a[i]*p);
+		if(n-i<=cnt) break;	//如果剩下的数不超过cnt个，可直接退出，节省时间
+		cnt=max(cnt,t);
+	}
+	printf("%d\n",cnt);
+	return 0;
+}
