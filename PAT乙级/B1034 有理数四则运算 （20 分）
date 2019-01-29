@@ -1,0 +1,116 @@
+本题要求编写程序，计算 2 个有理数的和、差、积、商。
+
+输入格式：
+
+输入在一行中按照 a1/b1 a2/b2 的格式给出两个分数形式的有理数，其中分子和分母全是整型范围内的整数，负号只可能出现在分子前，分母不为 0。
+
+输出格式：
+
+分别在 4 行中按照 有理数1 运算符 有理数2 = 结果 的格式顺序输出 2 个有理数的和、差、积、商。注意输出的每个有理数必须是该有理数的最简形式 k a/b，其中 k 是整数部分，a/b 是最简分数部分；若为负数，则须加括号；若除法分母为 0，则输出 Inf。题目保证正确的输出中没有超过整型范围的整数。
+
+输入样例 1：
+
+2/3 -4/2
+
+
+输出样例 1：
+
+2/3 + (-2) = (-1 1/3)2/3 - (-2) = 2 2/32/3 * (-2) = (-1 1/3)2/3 / (-2) = (-1/3)
+
+输入样例 2：
+
+5/3 0/6
+
+
+输出样例 2：
+
+1 2/3 + 0 = 1 2/31 2/3 - 0 = 1 2/31 2/3 * 0 = 01 2/3 / 0 = Inf
+
+题意：给出两个有理数（分数形式给出），让你按照格式输出它们加减乘除的结果。
+
+思路：
+
+1.由于数据是整型，相乘后可能会超过int范围，因此把数据定义为long long类型。对分数定义个结构体如下，
+
+struct node{	long long up,down;    //分别表示分子和分母};
+
+ 2.另外给的分数不一定是最简，因此需要约分，使用辗转相除法求最大公约数,再约分，注意把分子分母的绝对值代入求公约数。函数如下，
+
+#define LL long longLL gcd(LL a,LL b){	return b==0?a:gcd(b,a%b);}
+
+3.分数的输出单独写一个函数，注意区分整数，带分数，真分数情形，另外分子为0和分母为0单独判断。
+
+参考代码：
+--------------------- 
+#include<cstdio>
+#include<iostream>
+#include<cmath>
+#define LL long long
+using namespace std;
+struct node{
+	long long up,down;
+};
+LL gcd(LL a,LL b){
+	return b==0?a:gcd(b,a%b);
+}
+node reduction(node a){
+	if(a.down<0) {		//运算之后分母可能会成负数，需要处理
+		a.up=-a.up;
+		a.down=-a.down;
+	}
+	LL d=gcd(abs(a.up),abs(a.down));
+	if(d>1) {
+		a.up/=d;
+		a.down/=d;
+	}
+	return a;
+}
+node add(node a,node b){
+	node ans;
+	ans.up=a.up*b.down+b.up*a.down;
+	ans.down=a.down*b.down;
+	return ans;
+}
+node sub(node a,node b){
+	node ans;
+	ans.up=a.up*b.down-b.up*a.down;
+	ans.down=a.down*b.down;
+	return ans;
+}
+node mul(node a,node b){
+	node ans;
+	ans.up=a.up*b.up;
+	ans.down=a.down*b.down;
+	return reduction(ans);
+}
+node div(node a,node b){
+	node ans;
+	ans.up=a.up*b.down;
+	ans.down=a.down*b.up;
+	return ans;
+}
+void print(node a){
+	a=reduction(a);
+	if(a.up==0) printf("0");
+	else if(a.down==0) printf("Inf");
+	else if(a.up%a.down==0) {		//答案为整数情况
+		if(a.up<0) printf("(%lld)",a.up/a.down);
+		else printf("%lld",a.up/a.down);
+	}else if(abs(a.up)>=abs(a.down)) {
+		if(a.up<0) printf("(%lld %lld/%lld)",a.up/a.down, -a.up%a.down,a.down);
+		else printf("%lld %lld/%lld",a.up/a.down, a.up%a.down,a.down);
+	}else{
+		if(a.up<0) printf("(%lld/%lld)",a.up,a.down);
+		else printf("%lld/%lld",a.up,a.down);
+	}
+}
+int main()
+{
+	node a,b;
+	scanf("%lld/%lld %lld/%lld",&a.up,&a.down,&b.up,&b.down);
+	print(a);cout<<" + ";print(b);cout<<" = ";print(add(a,b));cout<<endl;
+	print(a);cout<<" - ";print(b);cout<<" = ";print(sub(a,b));cout<<endl;
+	print(a);cout<<" * ";print(b);cout<<" = ";print(mul(a,b));cout<<endl;
+	print(a);cout<<" / ";print(b);cout<<" = ";print(div(a,b));cout<<endl;
+	return 0;
+}
