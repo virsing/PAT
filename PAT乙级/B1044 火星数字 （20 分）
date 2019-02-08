@@ -1,0 +1,66 @@
+火星人是以 13 进制计数的：
+
+地球人的 0 被火星人称为 tret。
+	地球人数字 1 到 12 的火星文分别为：jan, feb, mar, apr, may, jun, jly, aug, sep, oct, nov, dec。
+	火星人将进位以后的 12 个高位数字分别称为：tam, hel, maa, huh, tou, kes, hei, elo, syy, lok, mer, jou。
+例如地球人的数字 29 翻译成火星文就是 hel mar；而火星文 elo nov 对应地球数字 115。为了方便交流，请你编写程序实现地球和火星数字之间的互译。
+
+输入格式：
+
+输入第一行给出一个正整数 N（<100），随后 N 行，每行给出一个 [0, 169) 区间内的数字 —— 或者是地球文，或者是火星文。
+
+输出格式：
+
+对应输入的每一行，在一行中输出翻译后的另一种语言的数字。
+
+输入样例：
+
+4295elo novtam
+
+输出样例：
+
+hel marmay11513
+
+题意：给出n个数字，让你把相应的阿拉伯数字转成火星文或者把火星文转成阿拉伯数字
+
+思路：为简化操作，先把0-168数字与火星文建立好哈希表 ，然后直接查表输出。注意13，26这些数字转换成火星文时后面不加零。
+
+参考代码：
+
+#include<cstdio>
+#include<string>
+#include<iostream>
+using namespace std;
+string digit[13]={"tret","jan","feb","mar","apr","may","jun","jly","aug","sep","oct","nov","dec"};
+string decade[13]={"","tam","hel","maa","huh","tou","kes","hei","elo","syy","lok","mer","jou"};
+string EarToMar[169];
+int main()
+{
+	int n;
+	string s;
+	for(int i=0;i<13;i++){
+		for(int j=0;j<13;j++){
+			if(i==0){						//处理0-12
+				EarToMar[j]=digit[j];
+			}else if(j==0){					//处理13的整数倍
+				EarToMar[i*13+j]=decade[i];
+			}else{							//处理其他数字
+				EarToMar[i*13+j]=decade[i]+" "+digit[j];
+			}
+		}
+	}
+	scanf("%d\n",&n);
+	for(int i=0;i<n;i++){
+		getline(cin,s);
+		if(s[0]>='0'&&s[0]<='9')
+			cout<<EarToMar[stoi(s,0,10)]<<endl;
+		else{
+			for(int j=0;j<169;j++){
+				if(s==EarToMar[j]){
+					cout<<j<<endl;break;
+				}
+			}
+		}
+	}
+	return 0;
+}
