@@ -1,0 +1,63 @@
+本题要求将给定的 N 个正整数按非递增的顺序，填入“螺旋矩阵”。所谓“螺旋矩阵”，是指从左上角第 1 个格子开始，按顺时针螺旋方向填充。要求矩阵的规模为 m 行 n 列，满足条件：m×n 等于 N；m≥n；且 m−n 取所有可能值中的最小值。
+
+输入格式：
+
+输入在第 1 行中给出一个正整数 N，第 2 行给出 N 个待填充的正整数。所有数字不超过 10​4​​，相邻数字以空格分隔。
+
+输出格式：
+
+输出螺旋矩阵。每行 n 个数字，共 m 行。相邻数字以 1 个空格分隔，行末不得有多余空格。
+
+输入样例：
+
+1237 76 20 98 76 42 53 95 60 81 58 93
+
+输出样例：
+
+98 95 9342 37 8153 20 7658 60 76
+
+思路：首先计算矩阵的行数m和列数n。由于m>=n,且m*n=N。所以可以让行数m从sqrt（N）（向上取整）开始寻找直到N可以被m整除为止。 接下来对数据降序排序，然后设置四个边界，一圈一圈把数据保存在二维数组中，在按要求输出。注意如果N==1需要特判，另外，当N为完全平方数时，方阵最中间只有一个数，需要单独判断，赋值。      新版测试最后一组总是超时！！！
+
+参考代码：
+--------------------- 
+#include<cstdio>
+#include<algorithm>
+#include<cmath>
+using namespace std;
+int a[10010],ans[5010][5010];
+bool cmp(int i,int j){
+	return i>j;
+}
+int main()
+{
+	int N;
+	scanf("%d",&N);
+	for(int i=0;i<N;i++)
+		scanf("%d",&a[i]);
+	if(N==1) {			//如果只有一个数需要单独判断
+		printf("%d\n",a[0]);
+		return 0;
+	}
+	sort(a,a+N,cmp);
+	int m=(int)ceil(sqrt(1.0*N));
+	while(N%m!=0){
+		m++;
+	}
+	int n=N/m,up=0,down=m-1,left=0,right=n-1,i=0,j=0,k=0;	//i,j标记一圈的初始位置
+	while(k<N){
+		while(k<N&&j<right)    {ans[i][j]=a[k++];j++;}
+		while(k<N&&i<down)     {ans[i][j]=a[k++];i++;}
+		while(k<N&&j>left)     {ans[i][j]=a[k++];j--;}
+		while(k<N&&i>up)       {ans[i][j]=a[k++];i--;}
+		up++;down--;left++;right--;i++;j++;
+		if(k==N-1) ans[i][j]=a[k++];		//完全平方数单独判断
+	}
+	for(int i=0;i<m;i++){
+		for(int j=0;j<n;j++){
+			if(j==0) printf("%d",ans[i][j]);
+			else printf(" %d",ans[i][j]);
+		}
+		printf("\n");
+	}
+	return 0;
+}
