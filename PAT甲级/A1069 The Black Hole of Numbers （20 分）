@@ -1,0 +1,72 @@
+For any 4-digit integer except the ones with all the digits being the same, if we sort the digits in non-increasing order first, and then in non-decreasing order, a new number can be obtained by taking the second number from the first one. Repeat in this manner we will soon end up at the number 6174 -- the black hole of 4-digit numbers. This number is named Kaprekar Constant.
+
+For example, start from 6767, we'll get:
+
+7766 - 6677 = 10899810 - 0189 = 96219621 - 1269 = 83528532 - 2358 = 61747641 - 1467 = 6174... ...
+
+Given any 4-digit number, you are supposed to illustrate the way it gets into the black hole.
+
+Input Specification:
+
+Each input file contains one test case which gives a positive integer N in the range (0,10​4​​).
+
+Output Specification:
+
+If all the 4 digits of N are the same, print in one line the equation N - N = 0000. Else print each step of calculation in a line until 6174 comes out as the difference. All the numbers must be printed as 4-digit numbers.
+
+Sample Input 1:
+
+6767
+
+
+Sample Output 1:
+
+7766 - 6677 = 10899810 - 0189 = 96219621 - 1269 = 83528532 - 2358 = 6174
+
+Sample Input 2:
+
+2222
+
+
+Sample Output 2:
+
+2222 - 2222 = 0000
+
+
+题意：任给一个数字n（0-10000不包含边界） ，首先把这个数字排列成一个最大数，然后排列成一个最小数，二者做差，知道结果为6174为止。如果给定数字为相同的四位数，直接输出n-n=0000.
+
+思路：按字符串读入，如果给定的数字不足四位，注意补全，输出也要严格按照四位输出。另外在判断数字是否等于6174时，应该先执行一次然后判断，建议使用do。。。while()语句。
+
+参考代码：
+--------------------- 
+#include<cstdio>
+#include<string>
+#include<iostream>
+#include<algorithm>
+using namespace std;
+string sub(string s){
+	while(s.size()<4) s.insert(0,"0");
+	sort(s.begin(),s.end());
+	string a=s;
+	reverse(a.begin(),a.end());
+	cout<<a<<" - "<<s<<" = ";
+	s=to_string(stoi(a,0,10)-stoi(s,0,10));
+	while(s.size()<4) s.insert(0,"0");
+	cout<<s<<endl;
+	return s;
+}
+
+int main()
+{
+	string s,ans;
+	cin>>s;
+	if(s.size()==4&&s[0]==s[1]&&s[1]==s[2]&&s[2]==s[3])
+		cout<<s<<" - "<<s<<" = "<<"0000\n";
+	else{
+		do{
+			s=sub(s);
+		}while(s!="6174");
+	}
+		return 0;
+}
+		
