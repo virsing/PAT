@@ -1,0 +1,122 @@
+A gas station has to be built at such a location that the minimum distance between the station and any of the residential housing is as far away as possible. However it must guarantee that all the houses are in its service range.
+
+Now given the map of the city and several candidate locations for the gas station, you are supposed to give the best recommendation. If there are more than one solution, output the one with the smallest average distance to all the houses. If such a solution is still not unique, output the one with the smallest index number.
+
+Input Specification:
+
+Each input file contains one test case. For each case, the first line contains 4 positive integers: N (≤10​3​​), the total number of houses; M (≤10), the total number of the candidate locations for the gas stations; K (≤10​4​​), the number of roads connecting the houses and the gas stations; and D​S​​, the maximum service range of the gas station. It is hence assumed that all the houses are numbered from 1 to N, and all the candidate locations are numbered from G1 to GM.
+
+Then K lines follow, each describes a road in the format
+
+P1 P2 Dist
+
+
+where P1 and P2 are the two ends of a road which can be either house numbers or gas station numbers, and Dist is the integer length of the road.
+
+Output Specification:
+
+For each test case, print in the first line the index number of the best location. In the next line, print the minimum and the average distances between the solution and all the houses. The numbers in a line must be separated by a space and be accurate up to 1 decimal place. If the solution does not exist, simply output No Solution.
+
+Sample Input 1:
+
+4 3 11 51 2 21 4 21 G1 41 G2 32 3 22 G2 13 4 23 G3 24 G1 3G2 G1 1G3 G2 2
+
+Sample Output 1:
+
+G12.0 3.3
+
+Sample Input 2:
+
+2 1 2 101 G1 92 G1 20
+
+Sample Output 2:
+
+No Solution
+
+
+题意：给出一组n个顶点代表民房，再给出m个候选气站 ，以及气站能够服务的最大距离ds，让你选择一个合适的气站位置。选择条件如下：①气站距离民房的最短距离要最大，同时不能超过最大服务距离ds。②如果有多个地点最短距离相等，则选择平均距离最小的，如果还相等，选择编号最小的站。
+
+思路：
+
+1. 由于民房编号为1-n，气站是G1-Gm，所以写一个函数转化读入的站点名称，其中气站编号设为n+1---n+m。
+
+2.使用dijkstra算法求每个候选气站距离每个民房的最短距离，然后按要求选择符合条件的位置。遍历时使用avgdis标记距离民房的平均距离，mindis标记最小距离（初始为最大值），如果该气站距离某一民房的距离超过最大服务范围ds，则该候选站点不合格。使用ansAvg标记最终答案的平均距离（初始取最大值），ansDis标记最终答案的最小距离（初始设为-1，因为这个最小距离需要取所有站点中的最大值），ansId标记答案站点编号（初始为-1）。
+
+参考代码：
+--------------------- 
+#include<cstdio>
+#include<cstring>
+#include<string>
+#include<iostream>
+using namespace std;
+const int inf=(1<<30)-1;
+const int maxn=1020;
+int n,m,k,ds;
+int G[maxn][maxn],d[maxn],vis[maxn];
+int getIdx(string a){
+	if(a[0]=='G') 
+		return stoi(a.substr(1),0,10)+n;
+	else return stoi(a,0,10);
+}
+void dijkstra(int st){
+	fill(d,d+maxn,inf);
+	memset(vis,0,sizeof(vis));
+	d[st]=0;
+	for(int i=1;i<=n+m;i++){
+		int u=-1,mn=inf;
+		for(int j=1;j<=n+m;j++){
+			if(d[j]<mn&&!vis[j]){
+				u=j;
+				mn=d[j];
+			}
+		}
+		if(u==-1) return;
+		vis[u]=1;
+		for(int v=1;v<=n+m;v++){
+			if(!vis[v]&&G[u][v]!=inf&&d[u]+G[u][v]<d[v])
+				d[v]=d[u]+G[u][v];
+		}
+	}
+}
+int main()
+{
+	scanf("%d%d%d%d",&n,&m,&k,&ds);
+	fill(G[0],G[0]+maxn*maxn,inf);	//一定要把图初始化为最大值
+	string a,b;
+	for(int i=0;i<k;i++){
+		cin>>a>>b;
+		int u=getIdx(a);
+		int v=getIdx(b);
+		cin>>G[u][v];
+		G[v][u]=G[u][v];
+	}
+	int ansId=-1;
+	double ansAvg=inf,ansDis=-1;
+	for(int i=n+1;i<=n+m;i++){
+		dijkstra(i);
+		double avgDis=0,minDis=inf;	//avgdis标记该站点距离民房平均距离，mindis标记最小距离
+		for(int j=1;j<=n;j++){
+			if(d[j]>ds) { 
+				minDis=-1;
+				break;
+			}
+			if(d[j]<minDis) minDis=d[j];
+			avgDis+=1.0*d[j]/n;		
+			
+		}
+		if(minDis==-1) continue;
+		if(minDis>ansDis){
+			ansDis=minDis;
+			ansId=i-n;
+			ansAvg=avgDis;
+		}else if(minDis==ansDis&&ansAvg>avgDis){
+			ansAvg=avgDis;
+			ansId=i-n;
+		}
+	}
+	if(ansId==-1) printf("No Solution\n");
+	else{
+		printf("G%d\n%.1f %.1f\n",ansId,ansDis,ansAvg);
+	}
+	return 0;
+}
