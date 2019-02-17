@@ -1,0 +1,78 @@
+The Japanese language is notorious for its sentence ending particles. Personal preference of such particles can be considered as a reflection of the speaker's personality. Such a preference is called "Kuchiguse" and is often exaggerated artistically in Anime and Manga. For example, the artificial sentence ending particle "nyan~" is often used as a stereotype for characters with a cat-like personality:
+
+
+	Itai nyan~ (It hurts, nyan~)
+	
+	
+	Ninjin wa iyada nyan~ (I hate carrots, nyan~)
+	
+Now given a few lines spoken by the same character, can you find her Kuchiguse?
+
+Input Specification:
+
+Each input file contains one test case. For each case, the first line is an integer N (2≤N≤100). Following are N file lines of 0~256 (inclusive) characters in length, each representing a character's spoken line. The spoken lines are case sensitive.
+
+Output Specification:
+
+For each test case, print in one line the kuchiguse of the character, i.e., the longest common suffix of all N lines. If there is no such suffix, write nai.
+
+Sample Input 1:
+
+3Itai nyan~Ninjin wa iyadanyan~uhhh nyan~
+
+Sample Output 1:
+
+nyan~
+
+
+Sample Input 2:
+
+3Itai!Ninjinnwaiyada T_TT_T
+
+Sample Output 2:
+
+nai
+
+
+题意：给出n个字符串，让你找出这n个字符串的最长公共后缀并输出，如果没有输出“nai”。
+
+思路：首先求出这些字符串的最小长度minLen，然后把所有字符串倒置，变成求所有字符串的最长公共前缀，再然后，开始逐个字符串匹配最大长度，找最长公共前缀。
+
+参考代码：
+--------------------- 
+#include<cstdio>
+#include<cstring>
+#include<string>
+#include<iostream>
+#include<vector>
+using namespace std;
+int main()
+{
+	int n,minLen=260;
+	scanf("%d\n",&n);
+	vector<string> v;
+	string s;
+	for(int i=0;i<n;i++){
+		getline(cin,s);
+		reverse(s.begin(),s.end());
+		if(s.size()<minLen) minLen=s.size();
+		v.push_back(s);
+	}
+	for(int i=minLen;i>0;i--){
+		bool flag=true;
+		string str=v[0].substr(0,i);
+		for(int j=1;j<n&&flag;j++){
+			if(v[j].find(str)==-1){
+				flag=false;
+				break;
+			}
+		}
+		if(flag) {
+			reverse(str.begin(),str.end());
+			cout<<str<<endl;
+			return 0;
+		}
+	}
+	cout<<"nai"<<endl;
+	return 0;
+}
