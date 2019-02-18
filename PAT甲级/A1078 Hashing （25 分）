@@ -1,0 +1,72 @@
+The task of this problem is simple: insert a sequence of distinct positive integers into a hash table, and output the positions of the input numbers. The hash function is defined to be H(key)=key%TSize where TSize is the maximum size of the hash table. Quadratic probing (with positive increments only) is used to solve the collisions.
+
+Note that the table size is better to be prime. If the maximum size given by the user is not prime, you must re-define the table size to be the smallest prime number which is larger than the size given by the user.
+
+Input Specification:
+
+Each input file contains one test case. For each case, the first line contains two positive numbers: MSize (≤10​4​​) and N (≤MSize) which are the user-defined table size and the number of input numbers, respectively. Then N distinct positive integers are given in the next line. All the numbers in a line are separated by a space.
+
+Output Specification:
+
+For each test case, print the corresponding positions (index starts from 0) of the input numbers in one line. All the numbers in a line are separated by a space, and there must be no extra space at the end of the line. In case it is impossible to insert the number, print "-" instead.
+
+Sample Input:
+
+4 410 6 4 15
+
+Sample Output:
+
+0 1 4 -
+
+
+题意： 给出一组n个数以及表长Msize，让你建立哈希表，哈希函数为H（key）=key%Msize，冲突处理方法为平方探测法，并且只正向增加，即H=（a+1*1)%Msize,H=(a+2*2)%Msize,H=(a+3*3)%Msize等等。最后输出所有输入数据的地址，如果没有地址则输出“-”。注意，如果用户给定的表长Msize不是质数，则要选择大于Msize的最小质数作为表长。
+
+思路：首先写一个判断素数的函数求出素数表长，然后对于每一个给定的数子，求出对应的哈希地址，输出。
+
+参考代码：
+--------------------- 
+#include<cstdio>
+#include<cmath>
+using namespace std;
+int n,Msize,hasht[10010];
+bool judge(int n){
+	if(n<=1) return false;
+	int sqrtN=sqrt(1.0*n);
+	for(int i=2;i<=sqrtN;i++){
+		if(n%i==0) return false;
+	}
+	return true;
+}
+int getIdx(int n){	//这个函数处理冲突求下标，如果无解，则输出-1.
+	int k=1,id=n%Msize;
+	if(hasht[n%Msize]==0)
+		return n%Msize;
+	while(id!=(n+k*k)%Msize){
+		if(hasht[(n+k*k)%Msize]==0)
+			return (n+k*k)%Msize;
+		k++;
+	}
+	return -1;
+}
+int main()
+{
+	int t;
+	scanf("%d%d",&Msize,&n);
+	if(!judge(Msize)){	//判断表长是否为素数，若不是则求素数表长
+		for(int i=Msize+1;i<10010;i++)
+			if(judge(i)){
+				Msize=i;
+				break;
+			}
+	}
+	for(int i=0;i<n;i++){
+		scanf("%d",&t);
+		int id=getIdx(t);
+		if(id!=-1) hasht[id]=t;
+		if(i!=0) printf(" ");
+		if(id==-1) printf("-");
+		else printf("%d",id);
+	}
+	printf("\n");
+	return 0;
+}
