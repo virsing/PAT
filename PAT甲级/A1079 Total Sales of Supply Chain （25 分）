@@ -1,0 +1,70 @@
+A supply chain is a network of retailers（零售商）, distributors（经销商）, and suppliers（供应商）-- everyone involved in moving a product from supplier to customer.
+
+Starting from one root supplier, everyone on the chain buys products from one's supplier in a price P and sell or distribute them in a price that is r% higher than P. Only the retailers will face the customers. It is assumed that each member in the supply chain has exactly one supplier except the root supplier, and there is no supply cycle.
+
+Now given a supply chain, you are supposed to tell the total sales from all the retailers.
+
+Input Specification:
+
+Each input file contains one test case. For each case, the first line contains three positive numbers: N (≤10​5​​), the total number of the members in the supply chain (and hence their ID's are numbered from 0 to N−1, and the root supplier's ID is 0); P, the unit price given by the root supplier; and r, the percentage rate of price increment for each distributor or retailer. Then N lines follow, each describes a distributor or retailer in the following format:
+
+K​i​​ ID[1] ID[2] ... ID[K​i​​]
+
+where in the i-th line, K​i​​ is the total number of distributors or retailers who receive products from supplier i, and is then followed by the ID's of these distributors or retailers. K​j​​ being 0 means that the j-th member is a retailer, then instead the total amount of the product will be given after K​j​​. All the numbers in a line are separated by a space.
+
+Output Specification:
+
+For each test case, print in one line the total sales we can expect from all the retailers, accurate up to 1 decimal place. It is guaranteed that the number will not exceed 10​10​​.
+
+Sample Input:
+
+10 1.80 1.003 2 3 51 91 41 70 72 6 11 80 90 40 3
+
+Sample Output:
+
+42.4
+
+
+题意：给出一个树形的供应链，包括供应商，经销商，零售商，设总的结点数为n，初始价格p，单价费率增速为r，因此，结点编号为0-n-1，根结点固定为0号，接下来n行每行给出以当前编号i为供应商，向下延伸的结点总数num和分支结点编号 ，若num=0，则表示当前结点是叶节点。每增加一层经销商，单价增加r%。
+
+思路：首先建立树形的节点供应关系，然后从根结点进行DFS，并求出总价格。
+
+参考代码：
+--------------------- 
+#include<cstdio>
+#include<vector>
+using namespace std;
+struct node{		//树结点
+	int w;
+	vector<int> child;
+}T[100010];
+double p,r,ans=0;
+void DFS(int root,double price){
+	if(T[root].child.size()==0){	//叶结点计算售价
+		ans+=T[root].w*price;
+		return;
+	}
+	price=(1+r/100)*price;
+	for(int i=0;i<T[root].child.size();i++){
+		int v=T[root].child[i];
+		DFS(v,price);
+	}
+}
+int main()
+{
+	int n,num,t;
+	scanf("%d%lf%lf",&n,&p,&r);
+	for(int i=0;i<n;i++){
+		scanf("%d",&num);
+		if(num==0)	scanf("%d",&T[i].w);
+		else {
+			for(int j=0;j<num;j++){
+				scanf("%d",&t);
+				T[i].child.push_back(t);
+			}
+		}
+	}
+	DFS(0,p);
+	printf("%.1f\n",ans);
+	return 0;
+}
