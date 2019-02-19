@@ -1,0 +1,110 @@
+It is said that in 2011, there are about 100 graduate schools ready to proceed over 40,000 applications in Zhejiang Province. It would help a lot if you could write a program to automate the admission procedure.
+
+Each applicant will have to provide two grades: the national entrance exam grade GEG_EG​E​​, and the interview grade GIG_IG​I​​. The final grade of an applicant is (GE+GI)/2(G_E + G_I) / 2(G​E​​+G​I​​)/2. The admission rules are:
+
+
+	The applicants are ranked according to their final grades, and will be admitted one by one from the top of the rank list.
+	
+	
+	If there is a tied final grade, the applicants will be ranked according to their national entrance exam grade GEG_EG​E​​. If still tied, their ranks must be the same.
+	
+	
+	Each applicant may have KKK choices and the admission will be done according to his/her choices: if according to the rank list, it is one's turn to be admitted; and if the quota of one's most preferred shcool is not exceeded, then one will be admitted to this school, or one's other choices will be considered one by one in order. If one gets rejected by all of preferred schools, then this unfortunate applicant will be rejected.
+	
+	
+	If there is a tied rank, and if the corresponding applicants are applying to the same school, then that school must admit all the applicants with the same rank, even if its quota will be exceeded.
+	
+Input Specification:
+
+Each input file contains one test case.
+
+Each case starts with a line containing three positive integers: NNN (≤40,000\le 40,000≤40,000), the total number of applicants; MMM (≤100\le 100≤100), the total number of graduate schools; and KKK (≤5\le 5≤5), the number of choices an applicant may have.
+
+In the next line, separated by a space, there are MMM positive integers. The iii-th integer is the quota of the iii-th graduate school respectively.
+
+Then NNN lines follow, each contains 2+K2+K2+K integers separated by a space. The first 2 integers are the applicant's GEG_EG​E​​ and GIG_IG​I​​, respectively. The next KKK integers represent the preferred schools. For the sake of simplicity, we assume that the schools are numbered from 0 to M−1M-1M−1, and the applicants are numbered from 0 to N−1N-1N−1.
+
+Output Specification:
+
+For each test case you should output the admission results for all the graduate schools. The results of each school must occupy a line, which contains the applicants' numbers that school admits. The numbers must be in increasing order and be separated by a space. There must be no extra space at the end of each line. If no applicant is admitted by a school, you must output an empty line correspondingly.
+
+Sample Input:
+
+11 6 32 1 2 2 2 3100 100 0 1 260 60 2 3 5100 90 0 3 490 100 1 2 090 90 5 1 380 90 1 0 280 80 0 1 280 80 0 1 280 70 1 3 270 80 1 2 3100 100 0 2 4
+
+Sample Output:
+
+0 1035 6 72 8 1 4
+
+题意： 给出n名考生，m所学校，每位学生k个志愿，再给出这m所学校的招生名额quota[m]，让你模拟录取系统，对这n名学生执行录取操作。排名规则如下：①求出每位考生的最终分数final=（Ge+Gi）/2，按总分降序排列，如果总分相同，按Ge降序排列，如果还相同，则排名相同。录取顺序按降序操作，如果某学校的名额用完，但当前考生如果和该校最后一名录取考生排名相同，则应该突破名额限制，破格录取，否则不予录取。
+
+思路：首先给学生建立结构体
+
+struct node{	int id,r,Ge,Gi,final;   //id标记学生编号，r是排名，final可以直接等于Ge和Gi的总分	int choice[5];        //选择的志愿}stu[40010];
+
+ 然后对学生按规则排序，排序完后求出排名，由高到低执行录取操作，如果该学生当前志愿学校还有名额，直接录取，否则如果当前考生排名和该校最后一名录取考生排名相同，也应该录取。最后对各学校已录取考生的id升序排列，然后输出。
+
+参考代码：
+--------------------- 
+#include<cstdio>
+#include<vector>
+#include<algorithm>
+using namespace std;
+struct node{
+	int id,r,Ge,Gi,final;
+	int choice[5];
+}stu[40010];
+int n,m,k,quota[110];	//quota[]保存学校的名额
+vector<int> admit[105];		//保存实际录取的结果
+bool cmp(node a,node b){
+	if(a.final!=b.final) 
+		return a.final>b.final;
+	else 
+		return a.Ge>b.Ge;
+}
+bool cmp1(int a,int b){
+	return stu[a].id<stu[b].id;
+}
+int main()
+{
+	scanf("%d%d%d",&n,&m,&k);
+	for(int i=0;i<m;i++){
+		scanf("%d",&quota[i]);
+	}
+	for(int i=0;i<n;i++){
+		scanf("%d%d",&stu[i].Ge,&stu[i].Gi);
+		for(int j=0;j<k;j++)
+			scanf("%d",&stu[i].choice[j]);
+		stu[i].id=i;			//由于排序后下标会打乱，因此要记录id
+		stu[i].final=stu[i].Ge+stu[i].Gi;
+	}
+	sort(stu,stu+n,cmp);
+	for(int i=0;i<n;i++){
+		if(i>0&&stu[i].final==stu[i-1].final&&stu[i].Ge==stu[i-1].Ge)
+			stu[i].r=stu[i-1].r;
+		else stu[i].r=i+1;
+		for(int j=0;j<k;j++){
+			int idx=stu[i].choice[j];	//记录学校的id
+			if(quota[idx]>0){
+				admit[idx].push_back(i);	//存储的应该是下标i，而不是id，因为后面last会用到下标
+				quota[idx]--;
+				break;
+			}else if(admit[idx].size()>0){	//该学校已经录取了学生，才能求最后一名录取考生标号
+				int last=admit[idx].back();	//该学校录取的最后一名同学的编号
+				if(stu[i].r==stu[last].r){
+					admit[idx].push_back(i);
+					break;
+				}
+			}
+		}
+	}
+	for(int i=0;i<m;i++){
+		sort(admit[i].begin(),admit[i].end(),cmp1);
+		for(int j=0;j<admit[i].size();j++){
+			if(j!=0) printf(" ");
+			printf("%d",stu[admit[i][j]].id);
+		}
+		printf("\n");
+	}
+	return 0;
+}
