@@ -1,0 +1,51 @@
+On a broken keyboard, some of the keys are worn out. So when you type some sentences, the characters corresponding to those keys will not appear on screen.
+
+Now given a string that you are supposed to type, and the string that you actually type out, please list those keys which are for sure worn out.
+
+Input Specification:
+
+Each input file contains one test case. For each case, the 1st line contains the original string, and the 2nd line contains the typed-out string. Each string contains no more than 80 characters which are either English letters [A-Z] (case insensitive), digital numbers [0-9], or _ (representing the space). It is guaranteed that both strings are non-empty.
+
+Output Specification:
+
+For each test case, print in one line the keys that are worn out, in the order of being detected. The English letters must be capitalized. Each worn out key must be printed once only. It is guaranteed that there is at least one worn out key.
+
+Sample Input:
+
+7_This_is_a_test_hs_s_a_es
+
+Sample Output:
+
+7TI
+
+
+题意：给出一个源字符串，再给出一个实际输出的字符串，让你找出其中因为按键损坏而没有输出的字符，按发现的顺序输出，每个字符仅输出一次。
+
+思路：建立哈希表标记实际输出的字符，然后再遍历源字符串，如果该字符没有出现在实际输出的串中，则表明该键是坏键，输出并做标记。由于小写字母要按大写输出，因此在碰到小写字母时，自动转为大写在执行后续操作。
+
+参考代码： 
+--------------------- 
+#include<cstdio>
+#include<iostream>
+#include<string>
+using namespace std;
+int hasht[256],flag[256];
+int main()
+{
+	string ori,now;
+	getline(cin,ori);
+	getline(cin,now);
+	for(int i=0;i<now.size();i++){
+		if(now[i]>='a'&&now[i]<='z') now[i]-=32;
+		hasht[now[i]]=1;
+	}
+	for(int i=0;i<ori.size();i++){
+		if(ori[i]>='a'&&ori[i]<='z') ori[i]-=32;
+		if(hasht[ori[i]]==0&&flag[ori[i]]==0){
+			cout<<ori[i];
+			flag[ori[i]]=1;
+		}
+	}
+	cout<<endl;
+	return 0;
+}
