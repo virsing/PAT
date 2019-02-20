@@ -1,0 +1,72 @@
+Given a list of N student records with name, ID and grade. You are supposed to sort the records with respect to the grade in non-increasing order, and output those student records of which the grades are in a given interval.
+
+Input Specification:
+
+Each input file contains one test case. Each case is given in the following format:
+
+Nname[1] ID[1] grade[1]name[2] ID[2] grade[2]... ...name[N] ID[N] grade[N]grade1 grade2
+
+where name[i] and ID[i] are strings of no more than 10 characters with no space, grade[i] is an integer in [0, 100], grade1 and grade2 are the boundaries of the grade's interval. It is guaranteed that all the grades are distinct.
+
+Output Specification:
+
+For each test case you should output the student records of which the grades are in the given interval [grade1, grade2] and are in non-increasing order. Each student record occupies a line with the student's name and ID, separated by one space. If there is no student's grade in that interval, output NONE instead.
+
+Sample Input 1:
+
+4Tom CS000001 59Joe Math990112 89Mike CS991301 100Mary EE990830 9560 100
+
+Sample Output 1:
+
+Mike CS991301Mary EE990830Joe Math990112
+
+Sample Input 2:
+
+2Jean AA980920 60Ann CS01 8090 95
+
+Sample Output 2:
+
+NONE
+
+
+ 题意：给出一组同学的姓名，id，成绩，再给出一个成绩区间，让你按降序输出指定区间内的学生。
+
+思路：把符合条件的学生push到vector内，在排序，然后输出即可。
+
+参考代码：
+--------------------- 
+#include<cstdio>
+#include<iostream>
+#include<string>
+#include<algorithm>
+#include<vector>
+using namespace std;
+struct node{
+	string name,id;
+	int grade;
+}stu[110];
+bool cmp(node a,node b){
+	return a.grade>b.grade;
+}
+int main()
+{
+	int n,l,r;
+	scanf("%d",&n);
+	vector<node> ans;
+	for(int i=0;i<n;i++){
+		cin>>stu[i].name>>stu[i].id>>stu[i].grade;
+	}
+	scanf("%d%d",&l,&r);
+	for(int i=0;i<n;i++){
+		if(stu[i].grade>=l&&stu[i].grade<=r)
+			ans.push_back(stu[i]);
+	}
+	sort(ans.begin(),ans.end(),cmp);
+	if(ans.size()==0) cout<<"NONE\n";
+	else{
+		for(int i=0;i<ans.size();i++){
+			cout<<ans[i].name<<" "<<ans[i].id<<endl;
+		}
+	}
+	return 0;
+}
