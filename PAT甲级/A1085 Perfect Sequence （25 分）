@@ -1,0 +1,59 @@
+Given a sequence of positive integers and another positive integer p. The sequence is said to be a perfect sequence if M≤m×p where M and m are the maximum and minimum numbers in the sequence, respectively.
+
+Now given a sequence and a parameter p, you are supposed to find from the sequence as many numbers as possible to form a perfect subsequence.
+
+Input Specification:
+
+Each input file contains one test case. For each case, the first line contains two positive integers N and p, where N (≤10​5​​) is the number of integers in the sequence, and p (≤10​9​​) is the parameter. In the second line there are N positive integers, each is no greater than 10​9​​.
+
+Output Specification:
+
+For each test case, print in one line the maximum number of integers that can be chosen to form a perfect subsequence.
+
+Sample Input:
+
+10 82 3 20 4 5 1 6 7 8 9
+
+Sample Output:
+
+8
+
+
+题意：定义完美数列为，该数列中最小数m和最大数M满足如下关系，m*p>=M,其中p为给定的参数，给出一组数，让你找出其中的最长的完美数列。
+
+思路：首先对数组排序，然后遍历数组，对每一个数字a[i],求出其对应的完美数列长度，最后取最大长度输出。其中求完美数列长度可以写一个二分查找函数，求第一个a[j],使a[j]>a[i]*p,即第一个不满足小于等于a[i]*p的数。
+
+注意：①每个数字范围为int型，因此a[i]*p可能会超过int，因此应使用long long 类型。
+
+②由于求的是第一个不满足M<=m*p的数，因此二分查找的右边界为n，即整个数组都满足完美数列关系。
+
+参考代码：
+--------------------- 
+#include<cstdio>
+#include<algorithm>
+using namespace std;
+int n,p,mxLen=0;
+int a[100010];
+int Bsearch(int l,int r,long long mx){
+	int mid;
+	while(l<r){
+		mid=(l+r)/2;
+		if(a[mid]>mx)
+			r=mid;
+		else l=mid+1;
+	}
+	return l;
+}
+int main()
+{
+	scanf("%d%d",&n,&p);
+	for(int i=0;i<n;i++)
+		scanf("%d",&a[i]);
+	sort(a,a+n);
+	for(int i=0;i<n;i++){
+		int t=Bsearch(i,n,(long long)a[i]*p);	//，右边界为n，这里必须使用强制转换
+		mxLen=max(mxLen,t-i);
+	}
+	printf("%d\n",mxLen);
+	return 0;
+}
