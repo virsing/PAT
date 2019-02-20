@@ -1,0 +1,93 @@
+Given N rational numbers in the form numerator/denominator, you are supposed to calculate their sum.
+
+Input Specification:
+
+Each input file contains one test case. Each case starts with a positive integer N (≤100), followed in the next line N rational numbers a1/b1 a2/b2 ... where all the numerators and denominators are in the range of long int. If there is a negative number, then the sign must appear in front of the numerator.
+
+Output Specification:
+
+For each test case, output the sum in the simplest form integer numerator/denominator where integer is the integer part of the sum, numerator < denominator, and the numerator and the denominator have no common factor. You must output only the fractional part if the integer part is 0.
+
+Sample Input 1:
+
+52/5 4/15 1/30 -2/60 8/3
+
+Sample Output 1:
+
+3 1/3
+
+
+Sample Input 2:
+
+24/3 2/3
+
+Sample Output 2:
+
+2
+
+
+Sample Input 3:
+
+31/3 -1/6 1/8
+
+Sample Output 3:
+
+7/24
+
+
+题意：给出n个分数，让你求和并按格式输出。如果答案是整数，按整数输出，如果是假分数，按带分数输出，如果是真分数，按标准格式输出，分子与分母必须约分到最简。
+
+思路：1.定义分数的结构体，再写一个化简函数，对分子分母约分 ，注意约分时，应对分子分母的绝对值进行求最大公约数的操作。
+
+2.在求和时，每次求和之后都要化简，否则会溢出，虽然给出的分子不会超过int类型，但答案可能会超过int型，因此必须使用long long类型定义。
+
+3.写一个输出函数，分真分数，假分数，整数，以及0这四种情况输出。
+
+参考代码：
+--------------------- 
+#include<cstdio>
+using namespace std;
+long long gcd(long long a,long long b){
+	if(b==0) return a;
+	else return gcd(b,a%b);
+}
+struct node{
+	long long up,down;
+};
+void reduction(node& a){
+	long long d=gcd(abs(a.up),abs(a.down));
+	if(a.down<0) {	//如果分母为负，把负号转移到分子上
+		a.up=-a.up;
+		a.down=-a.down;
+	}
+	a.up/=d;
+	a.down/=d;
+}
+void print(node a){
+	reduction(a);
+	if(a.up==0) printf("0\n");
+	else if(abs(a.up)<abs(a.down)) printf("%lld/%lld\n",a.up,a.down);	//真分数
+	else if(a.up%a.down==0) printf("%lld\n",a.up/a.down);	//整数
+	else{
+		 printf("%lld %lld/%lld\n",a.up/a.down,a.up%a.down,a.down);	//带分数
+	}
+}
+int main()
+{
+	long long n,up,down;
+	node ans;
+	scanf("%lld",&n);
+	for(int i=0;i<n;i++){
+		scanf("%lld/%lld",&up,&down);
+		if(i==0) {
+			ans.up=up;
+			ans.down=down;
+		}else{
+			ans.up=ans.up*down+ans.down*up;
+			ans.down*=down;
+		}
+		reduction(ans);
+	}
+	print(ans);
+	return 0;
+}
