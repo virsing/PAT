@@ -1,0 +1,133 @@
+Indeed there are many different tourist routes from our city to Rome. You are supposed to find your clients the route with the least cost while gaining the most happiness.
+
+Input Specification:
+
+Each input file contains one test case. For each case, the first line contains 2 positive integers N (2≤N≤200), the number of cities, and K, the total number of routes between pairs of cities; followed by the name of the starting city. The next N−1 lines each gives the name of a city and an integer that represents the happiness one can gain from that city, except the starting city. Then K lines follow, each describes a route between two cities in the format City1 City2 Cost. Here the name of a city is a string of 3 capital English letters, and the destination is always ROM which represents Rome.
+
+Output Specification:
+
+For each test case, we are supposed to find the route with the least cost. If such a route is not unique, the one with the maximum happiness will be recommanded. If such a route is still not unique, then we output the one with the maximum average happiness -- it is guaranteed by the judge that such a solution exists and is unique.
+
+Hence in the first line of output, you must print 4 numbers: the number of different routes with the least cost, the cost, the happiness, and the average happiness (take the integer part only) of the recommanded route. Then in the next line, you are supposed to print the route in the format City1->City2->...->ROM.
+
+Sample Input:
+
+6 7 HZHROM 100PKN 40GDN 55PRS 95BLN 80ROM GDN 1BLN ROM 1HZH PKN 1PRS ROM 2BLN HZH 2PKN GDN 1HZH PRS 1
+
+Sample Output:
+
+3 3 195 97HZH->PRS->ROM
+
+题意：给出n个城市，k条路径，起点城市start，以及每个城市的快乐值（不包括起点），让你求出起点到ROM的最短路线，如果有多条路线代价相同，选择快乐值最高的那条，如果还相同，选择平均快乐值最高的那条，第一行输出代价最小的路径条数，总代价，总快乐值，和平均快乐值（不包括起点），第二行输出路线。
+
+思路：使用dijkstra（）+DFS的方案，首先通过dijkstra算法求出前驱数组，然后通过前驱数组求总路径数，总快乐值和平均快乐值。
+
+参考代码：
+--------------------- 
+#include<cstdio>
+#include<cstring>
+#include<string>
+#include<unordered_map>
+#include<vector>
+#include<iostream>
+using namespace std;
+const int maxn=210;
+const int inf=(1<<30);
+int num=-1,n,k,st,ed,pathNum=0,ansHap=0,ansAveHap=0;		//st，ed标记起点和终点编号，后面分别是路径数，总快乐值和平均快乐值
+int G[maxn][maxn],d[maxn],vis[maxn],w[maxn];	//w是城市快乐值
+unordered_map<string,int> NameToId;
+string start,IdToName[210];
+vector<int> pre[maxn],temp,ansPath;
+int GetId(string name){		//转换城市名字与编号
+	if(NameToId.find(name)==NameToId.end()){
+		num++;
+		NameToId[name]=num;
+		IdToName[num]=name;
+		return num;
+	}else
+		return NameToId[name];
+}
+void dijkstra(int s){
+	memset(vis,0,sizeof(vis));
+	fill(d,d+maxn,inf);
+	d[s]=0;
+	for(int i=0;i<n;i++){
+		int u=-1,mn=inf;
+		for(int j=0;j<n;j++){
+			if(!vis[j]&&d[j]<mn){
+				u=j;
+				mn=d[j];
+			}
+		}
+		if(u==-1) return;
+		vis[u]=1;
+		for(int v=0;v<n;v++){
+			if(!vis[v]&&G[u][v]!=inf)
+				if(d[u]+G[u][v]<d[v]){
+					d[v]=d[u]+G[u][v];
+					pre[v].clear();
+					pre[v].push_back(u);
+				}else if(d[u]+G[u][v]==d[v]){
+					pre[v].push_back(u);
+				}
+		}
+	}
+}
+void DFS(int u){
+	if(u==0){	//起点编号为0，每次到0，就是一条路线，接下来计算路线的快乐值
+		pathNum++;
+		temp.push_back(st);
+		int hap=0,aveHap=0;
+		for(int i=0;i<temp.size();i++){
+			int v=temp[i];
+			hap+=w[v];
+		}
+		aveHap=hap/(temp.size()-1);
+		if(hap>ansHap){
+			ansPath=temp;
+			ansHap=hap;
+			ansAveHap=aveHap;
+		}else if(hap==ansHap&&aveHap>ansAveHap){
+			ansPath=temp;
+			ansAveHap=aveHap;
+		}
+		temp.pop_back();
+		return;
+	}
+	temp.push_back(u);
+	for(int i=0;i<pre[u].size();i++){
+		int v=pre[u][i];
+		DFS(v);
+	}
+	temp.pop_back();
+}
+int main()
+{
+	int t,id;
+	string s1,s2;
+	cin>>n>>k>>start;
+	st=GetId(start);
+	fill(G[0],G[0]+maxn*maxn,inf);	//要初始化图
+	for(int i=0;i<n-1;i++){
+		cin>>s1>>t;
+		id=GetId(s1);
+		w[id]=t;
+	}
+	ed=NameToId["ROM"];
+	for(int i=0;i<k;i++){
+		cin>>s1>>s2>>t;
+		int u=NameToId[s1];
+		int v=NameToId[s2];
+		G[u][v]=G[v][u]=t;
+	}
+	dijkstra(st);
+	DFS(ed);
+	cout<<pathNum<<" "<<d[ed]<<" "<<ansHap<<" "<<ansAveHap<<endl;
+	for(int i=ansPath.size()-1;i>=0;i--){
+		int u=ansPath[i];
+		cout<<IdToName[u];
+		if(i!=0) cout<<"->";
+	}
+	cout<<endl;
+	return 0;
+}
