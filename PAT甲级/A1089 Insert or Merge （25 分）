@@ -1,0 +1,99 @@
+According to Wikipedia:
+
+Insertion sort iterates, consuming one input element each repetition, and growing a sorted output list. Each iteration, insertion sort removes one element from the input data, finds the location it belongs within the sorted list, and inserts it there. It repeats until no input elements remain.
+
+Merge sort works as follows: Divide the unsorted list into N sublists, each containing 1 element (a list of 1 element is considered sorted). Then repeatedly merge two adjacent sublists to produce new sorted sublists until there is only 1 sublist remaining.
+
+Now given the initial sequence of integers, together with a sequence which is a result of several iterations of some sorting method, can you tell which sorting method we are using?
+
+Input Specification:
+
+Each input file contains one test case. For each case, the first line gives a positive integer N (≤100). Then in the next line, N integers are given as the initial sequence. The last line contains the partially sorted sequence of the N numbers. It is assumed that the target sequence is always ascending. All the numbers in a line are separated by a space.
+
+Output Specification:
+
+For each test case, print in the first line either "Insertion Sort" or "Merge Sort" to indicate the method used to obtain the partial result. Then run this method for one more iteration and output in the second line the resuling sequence. It is guaranteed that the answer is unique for each test case. All the numbers in a line must be separated by a space, and there must be no extra space at the end of the line.
+
+Sample Input 1:
+
+103 1 2 8 7 5 9 4 6 01 2 3 7 8 5 9 4 6 0
+
+Sample Output 1:
+
+Insertion Sort1 2 3 5 7 8 9 4 6 0
+
+Sample Input 2:
+
+103 1 2 8 7 5 9 4 0 61 3 2 8 5 7 4 9 0 6
+
+Sample Output 2:
+
+Merge Sort1 2 3 8 4 5 7 9 0 6
+
+题意：给出一组数字，和一个部分排序的序列，让你判断该序列是是插入排序还是归并排序，并输出其下一步排序后的结果。
+
+思路： 首先对序列执行插入排序并判断，为了在判断某种排序后继续输出下一步排序后的结果，函数中先判断之后，在执行一次然后输出，在归并排序中，为了简化操作，采用非递归的方式进行归并操作，并用sort（）代替排序部分。
+
+参考代码：
+--------------------- 
+#include<cstdio>
+#include<cstring>
+#include<iostream>
+#include<vector>
+#include<algorithm>
+using namespace std;
+int n;
+bool InsertSort(vector<int> a,vector<int> now){
+	bool flag=false;
+	int j;
+	for(int i=1;i<n;i++){
+		if(i!=1&&a==now) flag=true;
+		int t=a[i];
+		for(j=i-1;j>=0&&a[j]>t;j--){
+				a[j+1]=a[j];
+		}
+		a[j+1]=t;
+		if(flag){
+			printf("Insertion Sort\n");
+			for(int k=0;k<n;k++){
+				if(k!=0) printf(" ");
+				printf("%d",a[k]);
+			}
+			printf("\n");
+			return true;
+		}
+	}
+	return flag;
+}
+void MergeSort(vector<int> a,vector<int> now){
+	bool flag=false;
+	for(int step=2;step/2<=n;step*=2){	//step为步长，最高可以是2N-1
+		if(a==now) flag=true;
+		for(int i=0;i<n;i+=step){
+			sort(a.begin()+i,a.begin()+min(i+step,n));
+		}
+		if(flag){
+			for(int k=0;k<n;k++){
+				if(k!=0) printf(" ");
+				printf("%d",a[k]);
+			}
+			printf("\n");
+			return ;
+		}
+	}
+}
+int main()
+{
+	scanf("%d",&n);
+	vector<int> ori(n),temp(n),now(n);
+	for(int i=0;i<n;i++)
+		scanf("%d",&ori[i]);
+	for(int i=0;i<n;i++)
+		scanf("%d",&now[i]);
+	temp=ori;
+	if(!InsertSort(temp,now)){
+		printf("Merge Sort\n");
+		MergeSort(ori,now);
+	}
+	return 0;
+}
