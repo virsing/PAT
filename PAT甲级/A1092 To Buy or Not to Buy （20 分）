@@ -1,0 +1,65 @@
+Eva would like to make a string of beads with her favorite colors so she went to a small shop to buy some beads. There were many colorful strings of beads. However the owner of the shop would only sell the strings in whole pieces. Hence Eva must check whether a string in the shop contains all the beads she needs. She now comes to you for help: if the answer is Yes, please tell her the number of extra beads she has to buy; or if the answer is No, please tell her the number of beads missing from the string.
+
+For the sake of simplicity, let's use the characters in the ranges [0-9], [a-z], and [A-Z] to represent the colors. For example, the 3rd string in Figure 1 is the one that Eva would like to make. Then the 1st string is okay since it contains all the necessary beads with 8 extra ones; yet the 2nd one is not since there is no black bead and one less red bead.
+
+
+
+Figure 1
+
+Input Specification:
+
+Each input file contains one test case. Each case gives in two lines the strings of no more than 1000 beads which belong to the shop owner and Eva, respectively.
+
+Output Specification:
+
+For each test case, print your answer in one line. If the answer is Yes, then also output the number of extra beads Eva has to buy; or if the answer is No, then also output the number of beads missing from the string. There must be exactly 1 space between the answer and the number.
+
+Sample Input 1:
+
+ppRYYGrrYBR2258YrR8RrY
+
+Sample Output 1:
+
+Yes 8
+
+
+Sample Input 2:
+
+ppRYYGrrYB225YrR8RrY
+
+Sample Output 2:
+
+No 2
+
+
+题意：给出两个字符串，第一个是店主的珠串，第二个是eva喜欢的颜色，问你第一个串是否包含eva喜欢的全部珠子颜色，如果是输出剩余的珠子个数，如果不是，输出还缺多少个。
+
+
+思路：首先对第一个串做哈希表，统计每一种珠子的个数，然后对第二个串中的每个珠子，都让哈希表中对应数值减一，遍历完毕后，分别统计哈希表中的正数和负数值，如果出现了负数说明缺少小红喜欢的珠子， 输出No，否则输出Yes。
+
+参考代码 ：
+--------------------- 
+#include<cstdio>
+#include<string>
+#include<iostream>
+using namespace std;
+int hasht[200];
+int main()
+{
+	int remain=0,need=0;
+	string s;
+	cin>>s;
+	for(int i=0;i<s.size();i++)
+		hasht[s[i]]++;
+	cin>>s;
+	for(int i=0;i<s.size();i++)
+		hasht[s[i]]--;
+	for(int i=0;i<200;i++){
+		if(hasht[i]>=0)
+			remain+=hasht[i];
+		else need-=hasht[i];
+	}
+	if(need) printf("No %d\n",need);
+	else printf("Yes %d\n",remain);
+	return 0;
+}
