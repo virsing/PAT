@@ -1,0 +1,64 @@
+A family hierarchy is usually presented by a pedigree tree where all the nodes on the same level belong to the same generation. Your task is to find the generation with the largest population.
+
+Input Specification:
+
+Each input file contains one test case. Each case starts with two positive integers N (<100) which is the total number of family members in the tree (and hence assume that all the members are numbered from 01 to N), and M (<N) which is the number of family members who have children. Then M lines follow, each contains the information of a family member in the following format:
+
+ID K ID[1] ID[2] ... ID[K]
+
+
+where ID is a two-digit number representing a family member, K (>0) is the number of his/her children, followed by a sequence of two-digit ID's of his/her children. For the sake of simplicity, let us fix the root ID to be 01. All the numbers in a line are separated by a space.
+
+Output Specification:
+
+For each test case, print in one line the largest population number and the level of the corresponding generation. It is assumed that such a generation is unique, and the root level is defined to be 1.
+
+Sample Input:
+
+23 1321 1 2301 4 03 02 04 0503 3 06 07 0806 2 12 1313 1 2108 2 15 1602 2 09 1011 2 19 2017 1 2205 1 1107 1 1409 1 1710 1 18
+
+Sample Output:
+
+9 4
+
+
+题意：给出一个家族树，让你找出那一代的人口最多，输出对应的人数和代数，假设根结点为第一代。
+
+思路：建立树形结构，然后对树执行DFS统计每一层的人口数，最后输出人口最多的即可。
+
+参考代码：
+--------------------- 
+#include<cstdio>
+#include<vector>
+using namespace std;
+struct node{
+	int id;
+	vector<int> child;
+}T[110];
+int n,m,cnt[110],maxLevel=1,maxNum=1;
+void DFS(int u,int d){
+	cnt[d]++;
+	if(cnt[d]>cnt[maxLevel])
+		maxLevel=d;
+	if(T[u].child.size()==0)
+		return;
+	for(int i=0;i<T[u].child.size();i++){
+		int v=T[u].child[i];
+		DFS(v,d+1);
+	}
+}
+int main()
+{
+	int u,t,num;
+	scanf("%d%d",&n,&m);
+	for(int i=1;i<=m;i++){
+		scanf("%d%d",&u,&num);
+		for(int j=0;j<num;j++){
+			scanf("%d",&t);
+			T[u].child.push_back(t);
+		}
+	}
+	DFS(1,1);
+	printf("%d %d\n",cnt[maxLevel],maxLevel);
+	return 0;
+}
