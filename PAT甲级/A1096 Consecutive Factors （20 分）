@@ -1,0 +1,60 @@
+Among all the factors of a positive integer N, there may exist several consecutive numbers. For example, 630 can be factored as 3×5×6×7, where 5, 6, and 7 are the three consecutive numbers. Now given any positive N, you are supposed to find the maximum number of consecutive factors, and list the smallest sequence of the consecutive factors.
+
+Input Specification:
+
+Each input file contains one test case, which gives the integer N (1<N<2​31​​).
+
+Output Specification:
+
+For each test case, print in the first line the maximum number of consecutive factors. Then in the second line, print the smallest sequence of the consecutive factors in the format factor[1]*factor[2]*...*factor[k], where the factors are listed in increasing order, and 1 is NOT included.
+
+Sample Input:
+
+630
+
+
+Sample Output:
+
+35*6*7
+
+题意：给出一个正整数n，让你求出其最长连续因子。
+
+思路：假设给定的数为n，从i=2开始枚举因子，只要还能继续整除，就让枚举因子j继续加一，直到不能整除为止，即可得到连续的因子长度。由数学知识可以得知其因子中大于等于sqrt（n）的最多只有一个，因此 i 只需要枚举到sqrt（N）即可。 注意特殊情况只有其自身一个因子的如2，3要特殊判断。
+
+参考代码：
+--------------------- 
+#include<cstdio>
+#include<vector>
+#include<cmath>
+using namespace std;
+int n,maxLength=0;
+vector<int> ans,temp;
+int main()
+{
+	scanf("%d",&n);
+	int sqrtN=sqrt(1.0*n);
+	for(int i=2;i<=sqrtN;i++){
+		if(n%i!=0) continue;
+		int t=n,num=0;
+		temp.clear();
+		for(int j=i;j<=sqrtN&&t%j==0;j++){
+			num++;
+			temp.push_back(j);
+			t/=j;
+			if(num>maxLength){
+				maxLength=num;
+				ans=temp;
+			}
+		}
+	}
+	if(maxLength==0) printf("1\n%d\n",n);	//特殊情况如2，3只有其本身一个因子的单独判断
+	else{
+		printf("%d\n",maxLength);
+		for(int i=0;i<ans.size();i++){
+			if(i!=0) printf("*");
+			printf("%d",ans[i]);
+		}
+		printf("\n");
+	}
+	return 0;
+}
