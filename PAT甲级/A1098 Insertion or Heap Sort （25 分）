@@ -1,0 +1,110 @@
+According to Wikipedia:
+
+Insertion sort iterates, consuming one input element each repetition, and growing a sorted output list. Each iteration, insertion sort removes one element from the input data, finds the location it belongs within the sorted list, and inserts it there. It repeats until no input elements remain.
+
+Heap sort divides its input into a sorted and an unsorted region, and it iteratively shrinks the unsorted region by extracting the largest element and moving that to the sorted region. it involves the use of a heap data structure rather than a linear-time search to find the maximum.
+
+Now given the initial sequence of integers, together with a sequence which is a result of several iterations of some sorting method, can you tell which sorting method we are using?
+
+Input Specification:
+
+Each input file contains one test case. For each case, the first line gives a positive integer N (≤100). Then in the next line, N integers are given as the initial sequence. The last line contains the partially sorted sequence of the N numbers. It is assumed that the target sequence is always ascending. All the numbers in a line are separated by a space.
+
+Output Specification:
+
+For each test case, print in the first line either "Insertion Sort" or "Heap Sort" to indicate the method used to obtain the partial result. Then run this method for one more iteration and output in the second line the resulting sequence. It is guaranteed that the answer is unique for each test case. All the numbers in a line must be separated by a space, and there must be no extra space at the end of the line.
+
+Sample Input 1:
+
+103 1 2 8 7 5 9 4 6 01 2 3 7 8 5 9 4 6 0
+
+Sample Output 1:
+
+Insertion Sort1 2 3 5 7 8 9 4 6 0
+
+Sample Input 2:
+
+103 1 2 8 7 5 9 4 6 06 4 5 1 0 3 2 7 8 9
+
+Sample Output 2:
+
+Heap Sort5 4 3 1 0 2 6 7 8 9
+
+题意：给出一组n数据的初始状态ori和若干步排序之后的状态now，让你判断是插入排序还是堆排序，并输出下一步排序后的结果。
+
+思路：由于给定数据一定是这两种排序中的一种，首先判断是不是插入排序，先判断，然后再排一次，这样当他们相同时可以直接输出答案。如果不是插入排序，进行堆排序。 
+
+参考代码：
+--------------------- 
+#include<cstdio>
+#include<vector>
+using namespace std;
+int n;
+bool InsertSort(vector<int> a,vector<int> now){
+	bool flag=false;
+	int j;
+	for(int i=1;i<n;i++){
+		if(i!=1&&a==now) flag=true;
+		int t=a[i];
+		for(j=i-1;j>=0&&a[j]>t;j--){
+				a[j+1]=a[j];
+		}
+		a[j+1]=t;
+		if(flag){
+			printf("Insertion Sort\n");
+			for(int k=0;k<n;k++){
+				if(k!=0) printf(" ");
+				printf("%d",a[k]);
+			}
+			printf("\n");
+			return true;
+		}
+	}
+	return flag;
+}
+void downAdjust(int i,int num,vector<int>& a){	//堆排序的向下调整操作
+	int j=2*i+1,t=a[i];
+	while(j<num){
+		if(j+1<num&&a[j+1]>a[j]) j++;
+		if(t>=a[j]) break;
+		else{
+			a[i]=a[j];
+			i=j;
+			j=2*j+1;
+		}
+	}
+	a[i]=t;
+}
+void Create(vector<int>& a){	//建堆
+	for(int i=n/2;i>=0;i--)
+		downAdjust(i,n,a);
+}
+void HeapSort(vector<int> a,vector<int> now){	//排序
+	bool flag=false;
+	for(int num=n-1;num>0&&!flag;num--){
+		if(a==now) flag=true;
+		swap(a[0],a[num]);
+		downAdjust(0,num,a);
+		if(flag){
+			for(int i=0;i<n;i++){
+				if(i!=0) printf(" ");
+				printf("%d",a[i]);
+			}
+		}	
+	}
+}
+int main()
+{
+	scanf("%d",&n);
+	vector<int> ori(n),now(n);
+	for(int i=0;i<n;i++)
+		scanf("%d",&ori[i]);
+	for(int i=0;i<n;i++)
+		scanf("%d",&now[i]);
+	if(!InsertSort(ori,now)){
+		printf("Heap Sort\n");
+		Create(ori);
+		HeapSort(ori,now);
+	}
+	return 0;
+}
