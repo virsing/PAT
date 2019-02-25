@@ -1,0 +1,74 @@
+A Binary Search Tree (BST) is recursively defined as a binary tree which has the following properties:
+
+The left subtree of a node contains only nodes with keys less than the node's key.
+	The right subtree of a node contains only nodes with keys greater than or equal to the node's key.
+	Both the left and right subtrees must also be binary search trees.
+Given the structure of a binary tree and a sequence of distinct integer keys, there is only one way to fill these keys into the tree so that the resulting tree satisfies the definition of a BST. You are supposed to output the level order traversal sequence of that tree. The sample is illustrated by Figure 1 and 2.
+
+
+
+Input Specification:
+
+Each input file contains one test case. For each case, the first line gives a positive integer N (≤100) which is the total number of nodes in the tree. The next N lines each contains the left and the right children of a node in the format left_index right_index, provided that the nodes are numbered from 0 to N−1, and 0 is always the root. If one child is missing, then −1 will represent the NULL child pointer. Finally N distinct integer keys are given in the last line.
+
+Output Specification:
+
+For each test case, print in one line the level order traversal sequence of that tree. All the numbers must be separated by a space, with no extra space at the end of the line.
+
+Sample Input:
+
+91 62 3-1 -1-1 45 -1-1 -17 -1-1 8-1 -173 45 11 58 82 25 67 38 42
+
+Sample Output:
+
+58 25 82 11 38 67 45 73 42
+
+
+题意：给出一棵n个结点的二叉树，再给n个不同的数，让你建立一棵二叉排序树，然后输出他的层序遍历序列。
+
+思路：首先根据题目建立一棵空二叉树，然后对给定的数据排序，之后使用中序遍历对其赋值即可得到一棵BST树，然后层序遍历输出。
+
+参考代码： 
+--------------------- 
+#include<cstdio>
+#include<vector>
+#include<queue>
+#include<algorithm>
+using namespace std;
+struct node{
+	int data,lchild,rchild;
+}T[110];
+int n,k=0,root=0,a[110];
+void inOrder(int root,int& k){
+	if(root==-1) return;
+	inOrder(T[root].lchild,k);
+	T[root].data=a[k];
+	k++;
+	inOrder(T[root].rchild,k);
+}
+void BFS(int root){
+	queue<int> q;
+	if(root==-1) return;
+	q.push(root);
+	while(!q.empty()){
+		int p=q.front();
+		if(p!=0) printf(" ");
+		printf("%d",T[p].data);
+		q.pop();
+		if(T[p].lchild!=-1) q.push(T[p].lchild);
+		if(T[p].rchild!=-1) q.push(T[p].rchild);
+	}
+}
+int main()
+{
+	scanf("%d",&n);
+	for(int i=0;i<n;i++)
+		scanf("%d%d",&T[i].lchild,&T[i].rchild);
+	for(int i=0;i<n;i++)
+		scanf("%d",&a[i]);
+	sort(a,a+n);
+	inOrder(root,k);
+	BFS(root);
+	printf("\n");
+	return 0;
+}
