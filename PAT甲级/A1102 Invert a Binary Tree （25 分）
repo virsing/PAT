@@ -1,0 +1,82 @@
+The following is from Max Howell @twitter:
+
+Google: 90% of our engineers use the software you wrote (Homebrew), but you can't invert a binary tree on a whiteboard so fuck off.
+
+
+Now it's your turn to prove that YOU CAN invert a binary tree!
+
+Input Specification:
+
+Each input file contains one test case. For each case, the first line gives a positive integer N (≤10) which is the total number of nodes in the tree -- and hence the nodes are numbered from 0 to N−1. Then N lines follow, each corresponds to a node from 0 to N−1, and gives the indices of the left and right children of the node. If the child does not exist, a - will be put at the position. Any pair of children are separated by a space.
+
+Output Specification:
+
+For each test case, print in the first line the level-order, and then in the second line the in-order traversal sequences of the inverted tree. There must be exactly one space between any adjacent numbers, and no extra space at the end of the line.
+
+Sample Input:
+
+81 -- -0 -2 7- -- -5 -4 6
+
+Sample Output:
+
+3 7 2 6 4 0 5 16 5 7 4 3 2 0 1
+
+题意：给出一个二叉树，让你输出这棵树左右倒置后的层序遍历和中序遍历。
+
+思路：首先建立二叉树，初始时所有结点左右子树赋值-1，然后寻找根结点编号，即没有在子节点中出现过的节点。接下来只要在遍历时，先访问右结点然后访问左结点，即可完成倒置。 
+
+参考代码：
+--------------------- 
+#include<cstdio>
+#include<queue>
+using namespace std;
+struct node{
+	int lchild,rchild;
+	node(int l=-1,int r=-1):lchild(l),rchild(r){}
+}T[15];
+int n,k=0,root=0,hasht[15];
+void BFS(int root){
+	if(root==n) return;
+	queue<int> q;
+	q.push(root);
+	while(!q.empty()){
+		int p=q.front();
+		q.pop();
+		if(p!=root) printf(" ");
+		printf("%d",p);
+		if(T[p].rchild!=-1) q.push(T[p].rchild);
+		if(T[p].lchild!=-1) q.push(T[p].lchild);
+	}
+}
+void RinOrder(int p){
+	if(p==-1) return;
+	RinOrder(T[p].rchild);
+	if(k!=0) printf(" ");	//注意中序遍历的第一个节点不是根结点
+	printf("%d",p);
+	k++;
+	RinOrder(T[p].lchild);
+}
+int main()
+{
+	scanf("%d",&n);
+	char a,b;
+	for(int i=0;i<n;i++){
+		getchar();
+		scanf("%c %c",&a,&b);
+		if(a!='-') {
+			T[i].lchild=a-'0';
+			hasht[a-'0']=1;
+		}
+		if(b!='-'){
+			T[i].rchild=b-'0';
+			hasht[b-'0']=1;
+		}
+	}
+	while(root<n&&hasht[root]){		//寻找根节点编号
+		root++;
+	}
+	BFS(root);
+	printf("\n");
+	RinOrder(root);
+	return 0;
+}
