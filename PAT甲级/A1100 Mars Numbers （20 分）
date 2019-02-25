@@ -1,0 +1,66 @@
+People on Mars count their numbers with base 13:
+
+Zero on Earth is called "tret" on Mars.
+	The numbers 1 to 12 on Earth is called "jan, feb, mar, apr, may, jun, jly, aug, sep, oct, nov, dec" on Mars, respectively.
+	For the next higher digit, Mars people name the 12 numbers as "tam, hel, maa, huh, tou, kes, hei, elo, syy, lok, mer, jou", respectively.
+For examples, the number 29 on Earth is called "hel mar" on Mars; and "elo nov" on Mars corresponds to 115 on Earth. In order to help communication between people from these two planets, you are supposed to write a program for mutual translation between Earth and Mars number systems.
+
+Input Specification:
+
+Each input file contains one test case. For each case, the first line contains a positive integer N (<100). Then N lines follow, each contains a number in [0, 169), given either in the form of an Earth number, or that of Mars.
+
+Output Specification:
+
+For each number, print in a line the corresponding number in the other language.
+
+Sample Input:
+
+4295elo novtam
+
+Sample Output:
+
+hel marmay11513
+
+题意：给出火星文对阿拉伯数字的转换规则，让你把指定的阿拉伯数字转换成火星文或者相反。
+
+思路：由于数据范围比较小0-169内，因此直接把所有数字对火星文全部存储起来，然后查表输出，注意13的整数倍不需要输出tret。
+
+参考代码：
+--------------------- 
+#include<cstdio>
+#include<string>
+#include<iostream>
+using namespace std;
+string digit[13]={"tret","jan","feb","mar","apr","may","jun","jly","aug","sep","oct","nov","dec"};
+string decade[13]={"","tam","hel","maa","huh","tou","kes","hei","elo","syy","lok","mer","jou"};
+string EarToMar[169];
+int main()
+{
+	int n,q;
+	string s;
+	for(int i=0;i<13;i++){
+		for(int j=0;j<13;j++){
+			if(i==0)
+				EarToMar[j]=digit[j];
+			else if(j==0)
+				EarToMar[i*13]=decade[i];
+			else
+				EarToMar[i*13+j]=decade[i]+" "+digit[j];
+		}
+	}
+	scanf("%d\n",&n);
+	for(int i=0;i<n;i++){
+		getline(cin,s);
+		if(s[0]>='0'&&s[0]<='9')
+			cout<<EarToMar[stoi(s,0,10)]<<endl;
+		else{
+			for(int i=0;i<169;i++){
+				if(EarToMar[i]==s){
+					cout<<i<<endl;
+					break;
+				}
+			}
+		}
+	}
+	return 0;
+}
