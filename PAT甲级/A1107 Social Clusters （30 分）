@@ -1,0 +1,92 @@
+When register on a social network, you are always asked to specify your hobbies in order to find some potential friends with the same hobbies. A social cluster is a set of people who have some of their hobbies in common. You are supposed to find all the clusters.
+
+Input Specification:
+
+Each input file contains one test case. For each test case, the first line contains a positive integer N (≤1000), the total number of people in a social network. Hence the people are numbered from 1 to N. Then N lines follow, each gives the hobby list of a person in the format:
+
+K​i​​: h​i​​[1] h​i​​[2] ... h​i​​[K​i​​]
+
+where K​i​​ (>0) is the number of hobbies, and h​i​​[j] is the index of the j-th hobby, which is an integer in [1, 1000].
+
+Output Specification:
+
+For each case, print in one line the total number of clusters in the network. Then in the second line, print the numbers of people in the clusters in non-increasing order. The numbers must be separated by exactly one space, and there must be no extra space at the end of the line.
+
+Sample Input:
+
+83: 2 7 101: 42: 5 31: 41: 31: 44: 6 8 1 51: 4
+
+Sample Output:
+
+34 3 1
+
+题意：给出n个人，以及这n个人的兴趣编号，问你一共可以组成多少个兴趣团体，规定，只要两个人有一项兴趣相同就属于同一个兴趣团体，最后输出兴趣团体的个数，然后降序输出这些团体的人数。
+
+思路：使用并查集统计团体个数，首先建立兴趣数组hobby[maxn],按兴趣编号把所有同一兴趣的人都压入数组中，然后执行并查集的合并操作，最后把统计结果放入hasht[maxn]中，再按降序排序，输出。
+
+参考代码：
+--------------------- 
+#include<cstdio>
+#include<vector>
+#include<algorithm>
+using namespace std;
+const int inf=(1<<30);
+const int maxn=1010;
+int n,cnt=0,father[maxn],hasht[maxn];	//father数组存放每个节点的根，hasht用来统计同一兴趣的人数
+vector<int> hobby[maxn];
+int findFather(int x){	//并查集+路径压缩
+	int a=x,z=x;
+	while(a!=father[a])
+		a=father[a];
+	while(x!=father[x]){
+		z=x;
+		x=father[x];
+		father[z]=a;
+	}
+	return a;
+}
+bool cmp(int a,int b){
+	return a>b;
+}
+int main()
+{
+	int num,t;
+	scanf("%d",&n);
+	for(int i=0;i<=n;i++)
+		father[i]=i;
+	for(int i=1;i<=n;i++){
+		scanf("%d:",&num);
+		for(int j=0;j<num;j++){
+			scanf("%d",&t);
+			hobby[t].push_back(i);
+		}
+	}
+	for(int i=1;i<=1000;i++){
+		int u,v,fu,fv;
+		for(int j=0;j<hobby[i].size();j++){
+			if(j==0) {
+				u=hobby[i][j];
+				fu=findFather(u);
+			}else {
+				v=hobby[i][j];
+				fv=findFather(v);
+				if(fu!=fv)
+					father[fv]=fu;
+			}
+		}
+	}
+	for(int i=1;i<=n;i++){
+		int fa=findFather(father[i]);		//这里需要在执行findfather（）函数，别忘了
+		if(hasht[fa]==0)
+			cnt++;
+		hasht[fa]++;
+	}
+	sort(hasht,hasht+maxn,cmp);
+	printf("%d\n",cnt);
+	for(int i=0;hasht[i];i++){
+		if(i!=0) printf(" ");
+		printf("%d",hasht[i]);
+	}
+	printf("\n");
+	return 0;
+}
