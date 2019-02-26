@@ -1,0 +1,97 @@
+The K−PK-PK−P factorization of a positive integer NNN is to write NNN as the sum of the PPP-th power of KKK positive integers. You are supposed to write a program to find the K−PK-PK−P factorization of NNN for any positive integers NNN, KKK and PPP.
+
+Input Specification:
+
+Each input file contains one test case which gives in a line the three positive integers NNN (≤400\le 400≤400), KKK (≤N\le N≤N) and PPP (1<P≤71 < P\le 71<P≤7). The numbers in a line are separated by a space.
+
+Output Specification:
+
+For each case, if the solution exists, output in the format:
+
+N = n[1]^P + ... n[K]^P
+
+
+where n[i] (i = 1, ..., K) is the i-th factor. All the factors must be printed in non-increasing order.
+
+Note: the solution may not be unique. For example, the 5-2 factorization of 169 has 9 solutions, such as 122+42+22+22+1212^2 + 4^2 + 2^2 + 2^2 + 1^212​2​​+4​2​​+2​2​​+2​2​​+1​2​​, or 112+62+22+22+2211^2 + 6^2 + 2^2 + 2^2 + 2^211​2​​+6​2​​+2​2​​+2​2​​+2​2​​, or more. You must output the one with the maximum sum of the factors. If there is a tie, the largest factor sequence must be chosen -- sequence { a1,a2,⋯,aKa_1, a_2, \cdots , a_Ka​1​​,a​2​​,⋯,a​K​​ } is said to be larger than { b1,b2,⋯,bKb_1, b_2, \cdots , b_Kb​1​​,b​2​​,⋯,b​K​​ } if there exists 1≤L≤K1\le L\le K1≤L≤K such that ai=bia_i=b_ia​i​​=b​i​​ for i<Li<Li<L and aL>bLa_L>b_La​L​​>b​L​​.
+
+If there is no solution, simple output Impossible.
+
+Sample Input 1:
+
+169 5 2
+
+
+Sample Output 1:
+
+169 = 6^2 + 6^2 + 6^2 + 6^2 + 5^2
+
+
+Sample Input 2:
+
+169 167 3
+
+
+Sample Output 2:
+
+Impossible
+
+
+题意：给出一个整数n，让你把它分解成k个数的p次方，要求这些因子的底数之和尽可能大，如果同解则选择较大的因子序列，所有因子按降序排列。
+
+思路：首先把所有数字的p次方小于等于n的数存入数组fac中，由于要求选择较大的底数序列，因此降序遍历，执行DFS针对选与不选当前数进行递归。 
+
+void DFS(int index,int nowk,int sum,int facSum)
+
+递归函数如上，其中index是当前数字的底数，nowk是当前已选择的个数，sum为当前总和，facSum是底数之和 ，当sum==n且nowk==k是说明找到一个答案，然后对比底数之和进行选择。当sum>n||nowk>k时退出递归。
+
+参考代码：
+--------------------- 
+
+#include<cstdio>
+#include<cmath>
+#include<vector>
+#include<algorithm>
+using namespace std;
+int n,p,k,maxFacSum=-1;	//maxFacSum存放最大底数和
+vector<int> ans,temp,fac;	//分别存放最优答案，递归中的临时序列，和i^p次方
+void init(){            //初始化求fac数组
+	int i=0,t=0;
+	while(t<=n){
+		fac.push_back(t);
+		i++;
+		t=(int)pow(double(i),double(p));	
+	}
+}
+void DFS(int index,int nowk,int sum,int facSum){
+	if(sum==n&&nowk==k){
+		if(facSum>maxFacSum){
+			ans=temp;
+			maxFacSum=facSum;
+		}
+		return;
+	}
+	if(sum>n||nowk>k) return;
+	if(index>=1){        //index=0数组值也是0
+		temp.push_back(index);
+		DFS(index,nowk+1,sum+fac[index],facSum+index);		//选择当前数
+		temp.pop_back();
+		DFS(index-1,nowk,sum,facSum);				//不选择当前数
+	}
+}
+int main()
+{
+	scanf("%d%d%d",&n,&k,&p);
+	init();
+	DFS(fac.size()-1,0,0,0);
+	if(maxFacSum==-1) printf("Impossible\n");
+	else{
+		printf("%d = ",n);
+		for(int i=0;i<ans.size();i++){
+			if(i==0) printf("%d^%d",ans[i],p);
+			else printf(" + %d^%d",ans[i],p);
+		}
+		printf("\n");
+	}
+	return 0;
+}
