@@ -1,0 +1,66 @@
+This time your job is to fill a sequence of N positive integers into a spiral matrix in non-increasing order. A spiral matrix is filled in from the first element at the upper-left corner, then move in a clockwise spiral. The matrix has m rows and n columns, where m and n satisfy the following: m×n must be equal to N; m≥n; and m−n is the minimum of all the possible values.
+
+Input Specification:
+
+Each input file contains one test case. For each case, the first line gives a positive integer N. Then the next line contains N positive integers to be filled into the spiral matrix. All the numbers are no more than 10​4​​. The numbers in a line are separated by spaces.
+
+Output Specification:
+
+For each test case, output the resulting matrix in m lines, each contains n numbers. There must be exactly 1 space between two adjacent numbers, and no extra space at the end of each line.
+
+Sample Input:
+
+1237 76 20 98 76 42 53 95 60 81 58 93
+
+Sample Output:
+
+98 95 9342 37 8153 20 7658 60 76
+
+题意：给出一组N个数，让你从大到小，按照顺时针方向螺旋输出 。其中行数m和列数n满足如下关系，m*n=N，且m>=n，同时m-n尽可能小。
+
+思路：由于m>=n,因此，初始时令m=sqrt(N)向上取整，然后逐个累加，直到N%m==0为止，接下来构造一个二维数组先把数字按螺旋的方式填进去在输出。首先规定上下左右四个界限up,down,left,right然后逐个填充，直到填充完毕。注意，如果N是平方数如9，16等，会剩下最后一个数字无法填入，此时需要特殊判断，填充。
+
+参考代码：
+--------------------- 
+#include<cstdio>
+#include<cmath>
+#include<algorithm>
+using namespace std;
+int N,m,n=0,a[10010],ans[10010][10010];
+bool cmp(int a,int b){
+	return a>b;
+}
+int main()
+{
+	scanf("%d",&N);
+	for(int i=0;i<N;i++)
+		scanf("%d",&a[i]);
+	if(N==1) {
+		printf("%d\n",a[0]);
+		return 0;
+	}
+	sort(a,a+N,cmp);
+	m=ceil(sqrt(1.0*N));
+	while(m<N&&N%m!=0) m++;
+	n=N/m;
+	int up=0,down=m-1,left=0,right=n-1,k=0,i=0,j=0;
+	while(k<N){				//螺旋填充
+		while(k<N&&j<right) ans[up][j++]=a[k++];
+		while(k<N&&i<down)    ans[i++][right]=a[k++];
+		while(k<N&&j>left) ans[down][j--]=a[k++];
+		while(k<N&&i>up)    ans[i--][left]=a[k++];
+		up++;down--;left++;right--;i=up;j=left;
+		if(k==N-1) ans[i][j]=a[k++];	//最后一个数单独判断
+	}
+	for(int i=0;i<m;i++){
+		for(int j=0;j<n;j++){
+			if(j==0)
+				printf("%d",ans[i][j]);
+			else 
+				printf(" %d",ans[i][j]);
+		}
+		printf("\n");
+	}
+	return 0;
+}
+	
