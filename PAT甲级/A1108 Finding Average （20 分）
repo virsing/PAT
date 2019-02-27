@@ -1,0 +1,69 @@
+The basic task is simple: given N real numbers, you are supposed to calculate their average. But what makes it complicated is that some of the input numbers might not be legal. A legal input is a real number in [−1000,1000] and is accurate up to no more than 2 decimal places. When you calculate the average, those illegal numbers must not be counted in.
+
+Input Specification:
+
+Each input file contains one test case. For each case, the first line gives a positive integer N (≤100). Then N numbers are given in the next line, separated by one space.
+
+Output Specification:
+
+For each illegal input number, print in a line ERROR: X is not a legal number where X is the input. Then finally print in a line the result: The average of K numbers is Y where K is the number of legal inputs and Y is their average, accurate to 2 decimal places. In case the average cannot be calculated, output Undefined instead of Y. In case K is only 1, output The average of 1 number is Y instead.
+
+Sample Input 1:
+
+75 -3.2 aaa 9999 2.3.4 7.123 2.35
+
+Sample Output 1:
+
+ERROR: aaa is not a legal numberERROR: 9999 is not a legal numberERROR: 2.3.4 is not a legal numberERROR: 7.123 is not a legal numberThe average of 3 numbers is 1.38
+
+Sample Input 2:
+
+2aaa -9999
+
+Sample Output 2:
+
+ERROR: aaa is not a legal numberERROR: -9999 is not a legal numberThe average of 0 numbers is Undefined
+
+题意：给出n个数，让你求这n个数的平均数，注意这n个数可能存在非法数字，非法数字不计算在平均数内。当且仅当一个数字在[-1000,1000],且 最高保留两位小数才被认为是合法的，输出时注意区分合法数字是0，1，大于1这三种情况。
+
+思路：首先判断数字是否合法，注意非法字符，小数点个数，以及小数位数，然后输出非法数字，最后统计平均数。
+
+参考代码：
+--------------------- 
+#include<cstdio>
+#include<iostream>
+#include<string>
+#include<cmath>
+#include<sstream>
+using namespace std;
+int n,num=0;		//num统计个数
+double ans,t;	
+int main()
+{
+	string s;
+	cin>>n;
+	for(int i=0;i<n;i++){
+		cin>>s;
+		int cnt=0,pos=0,flag=true;
+		for(int j=0;j<s.size()&&flag;j++){
+			if(!((s[j]>='0'&&s[j]<='9')||s[j]=='.'||(s[j]=='-'&&j==0)))
+				flag=false;
+			if(s[j]=='.') {		//统计小数点个数以及位置
+				cnt++;
+				pos=j;
+			}
+		}
+		stringstream ss(s);
+		ss>>t;
+		if(!flag||cnt>1||abs(t)>1000||(cnt&&s.size()-1-pos>2)){	//数字超过1000或小数位数超过2位均非法
+			cout<<"ERROR: "<<s<<" is not a legal number\n";
+			 continue;
+		}
+		ans+=t;
+		num++;
+	}
+	if(num==0) printf("The average of 0 numbers is Undefined\n");
+	else if(num==1) printf("The average of 1 number is %.2f\n",ans);
+	else printf("The average of %d numbers is %.2f\n",num,ans/num);
+	return 0;
+}
