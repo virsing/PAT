@@ -1,0 +1,51 @@
+Given a set of NNN (>1> 1>1) positive integers, you are supposed to partition them into two disjoint sets A1A_1A​1​​ and A2A_2A​2​​ of n1n_1n​1​​ and n2n_2n​2​​ numbers, respectively. Let S1S_1S​1​​ and S2S_2S​2​​ denote the sums of all the numbers in A1A_1A​1​​ and A2A_2A​2​​, respectively. You are supposed to make the partition so that ∣n1−n2∣|n_1 - n_2|∣n​1​​−n​2​​∣ is minimized first, and then ∣S1−S2∣|S_1 - S_2|∣S​1​​−S​2​​∣ is maximized.
+
+Input Specification:
+
+Each input file contains one test case. For each case, the first line gives an integer NNN (2≤N≤1052 \le N \le 10^52≤N≤10​5​​), and then NNN positive integers follow in the next line, separated by spaces. It is guaranteed that all the integers and their sum are less than 2312^{31}2​31​​.
+
+Output Specification:
+
+For each case, print in a line two numbers: ∣n1−n2∣|n_1 - n_2|∣n​1​​−n​2​​∣ and ∣S1−S2∣|S_1 - S_2|∣S​1​​−S​2​​∣, separated by exactly one space.
+
+Sample Input 1:
+
+1023 8 10 99 46 2333 46 1 666 555
+
+Sample Output 1:
+
+0 3611
+
+
+Sample Input 2:
+
+13110 79 218 69 3721 100 29 135 2 6 13 5188 85
+
+Sample Output 2:
+
+1 9359
+
+
+题意：给出n个数，让你把这n个数分成两组，这两组的个数之差要尽可能小，同时这两组数的和差距要尽可能大。
+
+思路：直接把整个数组排序，然后取前一半为第一组，后一半为第二组，输出个数之差和总和之差，其中个数之差要么为0要么为1，取决于n为奇数还是偶数。
+
+参考代码： 
+--------------------- 
+#include<cstdio>
+#include<algorithm>
+using namespace std;
+int n,a[100010],sum=0,s1=0;
+int main()
+{
+	scanf("%d",&n);
+	for(int i=0;i<n;i++){
+		scanf("%d",&a[i]);
+		sum+=a[i];
+	}
+	sort(a,a+n);
+	for(int i=0;i<n/2;i++)
+		s1+=a[i];
+	printf("%d %d\n",n%2,sum-s1-s1);
+	return 0;
+}
