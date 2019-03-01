@@ -1,0 +1,63 @@
+"Let's C" is a popular and fun programming contest hosted by the College of Computer Science and Technology, Zhejiang University. Since the idea of the contest is for fun, the award rules are funny as the following:
+
+0、 The Champion will receive a "Mystery Award" (such as a BIG collection of students' research papers...).
+	1、 Those who ranked as a prime number will receive the best award -- the Minions (小黄人)!
+	2、 Everyone else will receive chocolates.
+Given the final ranklist and a sequence of contestant ID's, you are supposed to tell the corresponding awards.
+
+Input Specification:
+
+Each input file contains one test case. For each case, the first line gives a positive integer N (≤10​4​​), the total number of contestants. Then N lines of the ranklist follow, each in order gives a contestant's ID (a 4-digit number). After the ranklist, there is a positive integer K followed by K query ID's.
+
+Output Specification:
+
+For each query, print in a line ID: award where the award is Mystery Award, or Minion, or Chocolate. If the ID is not in the ranklist, print Are you kidding? instead. If the ID has been checked before, print ID: Checked.
+
+Sample Input:
+
+61111666688881234555500016888800011111222288882222
+
+Sample Output:
+
+8888: Minion0001: Chocolate1111: Mystery Award2222: Are you kidding?8888: Checked2222: Are you kidding?
+
+题意：给出n个人的排名，再给出q个待查询的人，让你查询其对应的奖品并输出。注意 查询过的应当输出Checked，不存在的输出Are you kidding?.
+
+思路：简单模拟题，使用一个Rank数组标记排名，在使用vis数组标记是否已输出，按要求输出奖品即可。
+
+参考代码：
+--------------------- 
+#include<cstdio>
+#include<cmath>
+using namespace std;
+const int maxn=10010;
+int n,Rank[maxn],vis[maxn];
+bool judge(int n){
+	if(n<2) return false;
+	int sqrtN=sqrt(1.0*n);
+	for(int i=2;i<=sqrtN;i++){
+		if(n%i==0)
+			return false;
+	}
+	return true;
+}
+int main()
+{
+	int t,q;
+	scanf("%d",&n);
+	for(int i=1;i<=n;i++){
+		scanf("%d",&t);
+		Rank[t]=i;
+	}
+	scanf("%d",&q);
+	for(int i=0;i<q;i++){
+		scanf("%d",&t);
+		if(Rank[t]==0) printf("%04d: Are you kidding?\n",t);
+		else if(vis[t]) printf("%04d: Checked\n",t);
+		else if(Rank[t]==1) printf("%04d: Mystery Award\n",t);
+		else if(judge(Rank[t])) printf("%04d: Minion\n",t);
+		else printf("%04d: Chocolate\n",t);
+		vis[t]=1;
+	}
+	return 0;
+}
