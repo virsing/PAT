@@ -1,0 +1,83 @@
+Some scientists took pictures of thousands of birds in a forest. Assume that all the birds appear in the same picture belong to the same tree. You are supposed to help the scientists to count the maximum number of trees in the forest, and for any pair of birds, tell if they are on the same tree.
+
+Input Specification:
+
+Each input file contains one test case. For each case, the first line contains a positive number N (≤10​4​​) which is the number of pictures. Then N lines follow, each describes a picture in the format:
+
+K B​1​​ B​2​​ ... B​K​​
+
+where K is the number of birds in this picture, and B​i​​'s are the indices of birds. It is guaranteed that the birds in all the pictures are numbered continuously from 1 to some number that is no more than 10​4​​.
+
+After the pictures there is a positive number Q (≤10​4​​) which is the number of queries. Then Q lines follow, each contains the indices of two birds.
+
+Output Specification:
+
+For each test case, first output in a line the maximum possible number of trees and the number of birds. Then for each query, print in a line Yes if the two birds belong to the same tree, or No if not.
+
+Sample Input:
+
+43 10 1 22 3 44 1 5 7 83 9 6 4210 53 7
+
+Sample Output:
+
+2 10YesNo
+
+题意：假设一张照片上的鸟都在同一棵树上，给出n张照片，以及这n张照片上的鸟的编号，让你求出一共有几棵树，多少只鸟，并任意给出q对鸟的编号，问你是否在同一棵树上，其中鸟的编号从1开始连续编号。
+
+思路：使用并查集， 第一次输入时，就进行合并操作，接下来使用set容器求出一共有多少棵树，那由于鸟的编号从1开始连续编号，因此最大的编号就是鸟的总数，就下来，对每一对给定的编号，通过查找祖先的方式，看是否具有相同的根结点，如果是则在一棵树上，否则不再同一棵树上。
+
+参考代码：
+--------------------- 
+#include<cstdio>
+#include<cmath>
+#include<set>
+#include<algorithm>
+using namespace std;
+const int maxn=10010;
+int n,num,u,v,q,num_birds=0,father[maxn];
+set<int> st;
+int findFather(int x){
+	int a=x,z=x;
+	while(a!=father[a])
+		a=father[a];
+	while(x!=father[x]){
+		z=x;
+		x=father[x];
+		father[z]=a;
+	}
+	return a;
+}
+void Union(int u,int v){
+	int fu=findFather(u);
+	int fv=findFather(v);
+	if(fu!=fv)
+		father[max(fu,fv)]=min(fu,fv);
+}
+int main()
+{
+	scanf("%d",&n);
+	for(int i=0;i<maxn;i++) father[i]=i;
+	for(int i=0;i<n;i++){
+		scanf("%d%d",&num,&u);
+		num_birds=max(num_birds,u);
+		for(int j=1;j<num;j++){
+			scanf("%d",&v);
+			Union(u,v);
+			num_birds=max(num_birds,v);	//求最大的鸟的编号即为鸟类总数
+		}
+	}
+	for(int i=1;i<=num_birds;i++){
+		int fa=findFather(i);
+		st.insert(fa);	//借助set容器自动去重特性求树的数量
+	}
+	scanf("%d",&q);
+	printf("%d %d\n",st.size(),num_birds);
+	for(int i=0;i<q;i++){
+		scanf("%d%d",&u,&v);
+		int fu=findFather(u);
+		int fv=findFather(v);
+		if(fu!=fv) printf("No\n");
+		else printf("Yes\n");
+	}
+	return 0;
+}
