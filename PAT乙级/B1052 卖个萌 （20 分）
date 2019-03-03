@@ -1,0 +1,67 @@
+萌萌哒表情符号通常由“手”、“眼”、“口”三个主要部分组成。简单起见，我们假设一个表情符号是按下列格式输出的：
+
+[左手]([左眼][口][右眼])[右手]
+
+
+现给出可选用的符号集合，请你按用户的要求输出表情。
+
+输入格式：
+
+输入首先在前三行顺序对应给出手、眼、口的可选符号集。每个符号括在一对方括号 []内。题目保证每个集合都至少有一个符号，并不超过 10 个符号；每个符号包含 1 到 4 个非空字符。
+
+之后一行给出一个正整数 K，为用户请求的个数。随后 K 行，每行给出一个用户的符号选择，顺序为左手、左眼、口、右眼、右手——这里只给出符号在相应集合中的序号（从 1 开始），数字间以空格分隔。
+
+输出格式：
+
+对每个用户请求，在一行中输出生成的表情。若用户选择的序号不存在，则输出 Are you kidding me? @\/@。
+
+输入样例：
+
+[╮][╭][o][~\][/~]  [<][>] [╯][╰][^][-][=][>][<][@][⊙][Д][▽][_][ε][^]  ...41 1 2 2 26 8 1 5 53 3 4 3 32 10 3 9 3
+
+输出样例：
+
+╮(╯▽╰)╭<(@Д=)/~o(^ε^)oAre you kidding me? @\/@
+
+ 思路：使用getline一行一行的读取表情，然后逐一提取单个表情放到vector中，在设置一个flag，如果给定的下标超过了所给表情范围置flag=false，然后再输出。
+
+参考代码：
+--------------------- 
+#include<cstdio>
+#include<string>
+#include<iostream>
+#include<vector>
+using namespace std;
+vector<string> v[4];
+string s;
+int main()
+{
+	int n,a[6];
+	for(int i=0;i<3;i++){
+		getline(cin,s);
+		vector<string> row;
+		for(int j=0;j<s.size();j++){
+			if(s[j]=='['){	
+				int k=j+1;
+				while(k<s.size()&&s[k]!=']') k++;
+				row.push_back(s.substr(j+1,k-j-1));		//使用查找‘[]'的方式很方便
+			}
+		}
+		v[i]=row;
+	}
+	scanf("%d",&n);
+	for(int i=0;i<n;i++){
+		bool flag=true;
+		for(int j=0;j<5;j++){
+			scanf("%d",&a[j]);
+			if((j==0||j==4)&&a[j]-1>=v[0].size()) flag=false;
+			if((i==1||i==3)&&a[j]-1>=v[1].size()) flag=false;
+			if(i==2&&a[j]-1>=v[2].size()) flag=false;
+		}
+		if(!flag) cout<<"Are you kidding me? @\\/@\n";
+		else {
+			cout<<v[0][a[0]-1]<<"("<<v[1][a[1]-1]<<v[2][a[2]-1]<<v[1][a[3]-1]<<")"<<v[0][a[4]-1]<<endl;
+		}
+	}
+	return 0;
+}
