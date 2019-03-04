@@ -1,0 +1,67 @@
+本题的基本要求非常简单：给定 N 个实数，计算它们的平均值。但复杂的是有些输入数据可能是非法的。一个“合法”的输入是 [−1000,1000] 区间内的实数，并且最多精确到小数点后 2 位。当你计算平均值的时候，不能把那些非法的数据算在内。
+
+输入格式：
+
+输入第一行给出正整数 N（≤100）。随后一行给出 N 个实数，数字间以一个空格分隔。
+
+输出格式：
+
+对每个非法输入，在一行中输出 ERROR: X is not a legal number，其中 X 是输入。最后在一行中输出结果：The average of K numbers is Y，其中 K 是合法输入的个数，Y 是它们的平均值，精确到小数点后 2 位。如果平均值无法计算，则用 Undefined 替换 Y。如果 K 为 1，则输出 The average of 1 number is Y。
+
+输入样例 1：
+
+75 -3.2 aaa 9999 2.3.4 7.123 2.35
+
+输出样例 1：
+
+ERROR: aaa is not a legal numberERROR: 9999 is not a legal numberERROR: 2.3.4 is not a legal numberERROR: 7.123 is not a legal numberThe average of 3 numbers is 1.38
+
+输入样例 2：
+
+2aaa -9999
+
+输出样例 2：
+
+ERROR: aaa is not a legal numberERROR: -9999 is not a legal numberThe average of 0 numbers is Undefined
+
+思路：字符串形式读入每个数，然后判断数字是否合法，注意非法字符，小数点个数，以及小数位数，然后输出非法数字，最后统计平均数，字符串与浮点数的转化使用stringstream流。
+
+参考代码：
+--------------------- 
+#include<cstdio>
+#include<iostream>
+#include<string>
+#include<cmath>
+#include<sstream>
+using namespace std;
+int n,num=0;		//num统计个数
+double ans,t;	
+int main()
+{
+	string s;
+	cin>>n;
+	for(int i=0;i<n;i++){
+		cin>>s;
+		int cnt=0,pos=0,flag=true;
+		for(int j=0;j<s.size()&&flag;j++){
+			if(!((s[j]>='0'&&s[j]<='9')||s[j]=='.'||(s[j]=='-'&&j==0)))
+				flag=false;
+			if(s[j]=='.') {		//统计小数点个数以及位置
+				cnt++;
+				pos=j;
+			}
+		}
+		stringstream ss(s);    //使用字符串流把字符串转成浮点数
+		ss>>t;
+		if(!flag||cnt>1||abs(t)>1000||(cnt&&s.size()-1-pos>2)){	//数字超过1000或小数点存在且位数超过2位均非法
+			cout<<"ERROR: "<<s<<" is not a legal number\n";
+			 continue;
+		}
+		ans+=t;
+		num++;
+	}
+	if(num==0) printf("The average of 0 numbers is Undefined\n");
+	else if(num==1) printf("The average of 1 number is %.2f\n",ans);
+	else printf("The average of %d numbers is %.2f\n",num,ans/num);
+	return 0;
+}
