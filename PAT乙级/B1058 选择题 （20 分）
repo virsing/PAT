@@ -1,0 +1,86 @@
+批改多选题是比较麻烦的事情，本题就请你写个程序帮助老师批改多选题，并且指出哪道题错的人最多。
+
+输入格式：
+
+输入在第一行给出两个正整数 N（≤ 1000）和 M（≤ 100），分别是学生人数和多选题的个数。随后 M 行，每行顺次给出一道题的满分值（不超过 5 的正整数）、选项个数（不少于 2 且不超过 5 的正整数）、正确选项个数（不超过选项个数的正整数）、所有正确选项。注意每题的选项从小写英文字母 a 开始顺次排列。各项间以 1 个空格分隔。最后 N 行，每行给出一个学生的答题情况，其每题答案格式为 (选中的选项个数 选项1 ……)，按题目顺序给出。注意：题目保证学生的答题情况是合法的，即不存在选中的选项数超过实际选项数的情况。
+
+输出格式：
+
+按照输入的顺序给出每个学生的得分，每个分数占一行。注意判题时只有选择全部正确才能得到该题的分数。最后一行输出错得最多的题目的错误次数和编号（题目按照输入的顺序从 1 开始编号）。如果有并列，则按编号递增顺序输出。数字间用空格分隔，行首尾不得有多余空格。如果所有题目都没有人错，则在最后一行输出 Too simple。
+
+输入样例：
+
+3 4 3 4 2 a c2 5 1 b5 3 2 b c1 5 4 a b d e(2 a c) (2 b d) (2 a c) (3 a b e)(2 a c) (1 b) (2 a b) (4 a b d e)(2 b d) (1 e) (2 b c) (4 a b c d)
+
+输出样例：
+
+3652 2 3 4
+
+思路：定义一个结构体数组存放题目 
+
+struct node{	
+  int num,full_score,cnt_wrong;	//num为正确答案个数，cnt记录错误次数	
+  vector<char> v;			//存放正确选项
+  }q[110];
+
+题目全部读取完毕后，接下来按行提取学生的选项，可以使用一个变量idx记录题号，每次碰到‘（’，题号加一，并把学生的结果存放在vector中再与正确答案比较，记录得分，然后输出学生成绩，使用变量max_wrong（默认=0）记录错误的最大次数，如果最后仍为0，说明没有人做错，输出too simple，否则按顺序输出错误的题号。
+
+参考代码：
+--------------------- 
+#include<cstdio>
+#include<vector>
+#include<iostream>
+#include<string>
+using namespace std;
+int n,m,t,max_wrong=0;
+vector<int> ans;
+struct node{
+	int num,full_score,cnt_wrong;	//num为正确答案个数，cnt记录错误次数
+	vector<char> v;			//存放正确选项
+}q[110];
+int main()
+{
+	string s;
+	scanf("%d%d",&n,&m);
+	for(int i=0;i<m;i++){
+		scanf("%d%d%d",&q[i].full_score,&t,&q[i].num);
+		char c;
+		for(int j=0;j<q[i].num;j++){
+			scanf(" %c",&c);
+			q[i].v.push_back(c);
+		}
+	}
+	getchar();			//这里必须用getchar接受换行符
+	for(int i=0;i<n;i++){
+		getline(cin,s);
+		int score=0,idx=-1;		//score记录学生分数，idx记录题号
+		for(int j=0;j<s.size();j++){
+			if(s[j]=='('){
+				idx++;				//每次碰到‘（’接下来题号加一
+				vector<char> v;			//存放学生的选项
+				while(j<s.size()&&s[j]!=')'){
+					if(s[j]>='a'&&s[j]<='g')
+						v.push_back(s[j]);
+					j++;
+				}
+				if(v==q[idx].v)  score+=q[idx].full_score;	//如果学生选项和答案相同则得分
+				else {
+					q[idx].cnt_wrong++;
+					if(q[idx].cnt_wrong>max_wrong)
+						max_wrong=q[idx].cnt_wrong;
+				}
+			}
+		}
+		printf("%d\n",score);
+	}
+	if(!max_wrong) printf("Too simple\n");
+	else{
+		printf("%d",max_wrong);
+		for(int i=0;i<m;i++){
+			if(q[i].cnt_wrong==max_wrong)
+				printf(" %d",i+1);
+		}
+		printf("\n");
+	}
+	return 0;
+}
