@@ -1,0 +1,49 @@
+Two integers are called "friend numbers" if they share the same sum of their digits, and the sum is their "friend ID". For example, 123 and 51 are friend numbers since 1+2+3 = 5+1 = 6, and 6 is their friend ID. Given some numbers, you are supposed to count the number of different frind ID's among them.
+
+Input Specification:
+
+Each input file contains one test case. For each case, the first line gives a positive integer N. Then N positive integers are given in the next line, separated by spaces. All the numbers are less than 10​4​​.
+
+Output Specification:
+
+For each case, print in the first line the number of different frind ID's among the given integers. Then in the second line, output the friend ID's in increasing order. The numbers must be separated by exactly one space and there must be no extra space at the end of the line.
+
+Sample Input:
+
+8123 899 51 998 27 33 36 12
+
+Sample Output:
+
+43 6 9 26
+
+ 题意：给出n个整数，定义朋友数是：各位数字之和相等的数字。问你一共有多少朋友数。
+
+思路：使用set来存储所有的朋友证号，可以自动去重排序。
+
+参考代码：
+--------------------- 
+#include<cstdio>
+#include<set>
+#include<algorithm>
+using namespace std;
+set<int> ans;
+int main()
+{
+	int n,t,sum;
+	scanf("%d",&n);
+	for(int i=0;i<n;i++){
+		scanf("%d",&t);
+		sum=0;
+		while(t){
+			sum+=t%10;
+			t/=10;
+		}
+		ans.insert(sum);
+	}
+	printf("%d\n",ans.size());
+	for(auto it=ans.begin();it!=ans.end();it++)
+		if(it==ans.begin()) printf("%d",*it);
+		else printf(" %d",*it);
+	printf("\n");
+	return 0;
+}
