@@ -1,0 +1,90 @@
+Suppose that all the keys in a binary tree are distinct positive integers. A unique binary tree can be determined by a given pair of postorder and inorder traversal sequences. And it is a simple standard routine to print the numbers in level-order. However, if you think the problem is too simple, then you are too naive. This time you are supposed to print the numbers in "zigzagging order" -- that is, starting from the root, print the numbers level-by-level, alternating between left to right and right to left. For example, for the following tree you must output: 1 11 5 8 17 12 20 15.
+
+
+
+Input Specification:
+
+Each input file contains one test case. For each case, the first line gives a positive integer N (≤30), the total number of nodes in the binary tree. The second line gives the inorder sequence and the third line gives the postorder sequence. All the numbers in a line are separated by a space.
+
+Output Specification:
+
+For each test case, print the zigzagging sequence of the tree in a line. All the numbers in a line must be separated by exactly one space, and there must be no extra space at the end of the line.
+
+Sample Input:
+
+812 11 20 17 1 15 8 512 20 17 11 15 8 5 1
+
+Sample Output:
+
+1 11 5 8 17 12 20 15
+
+
+题意：给出一颗二叉树的中序和后序序列，让你按照‘z’字形 输出其层序遍历序列。
+
+思路：首先根据模板，通过中序和后序序列建立一棵二叉树，然后层序遍历并把结果按照层次，保存在二维的vector中，然后把这个vector中奇数层的数据正序访问输出，偶数层逆序访问输出，即可得到结果。
+
+参考代码：
+--------------------- 
+#include<cstdio>
+#include<vector>
+#include<algorithm>
+using namespace std;
+struct node{
+	int v;
+	node* lchild;
+	node* rchild;
+	node(int a):v(a),lchild(NULL),rchild(NULL){}
+};
+int n,in[35],post[35];
+node* Create(int inl,int inr,int postl,int postr){	//中序和后序序列建树
+	if(postl>postr) return NULL;
+	node* root=new node(post[postr]);
+	int k=inl;
+	while(k<=inr&&in[k]!=post[postr]) k++;
+	int numL=k-inl;
+	root->lchild=Create(inl,k-1,postl,postl+numL-1);
+	root->rchild=Create(k+1,inr,postl+numL,postr-1);
+	return root;
+}
+void BFS(node* root){
+	if(root==NULL) return;
+	node* q[35];
+	vector<int> v[35];
+	int front=-1,rear=-1,last=0,level=0;		//数组q模拟队列，last记录本层最后结点编号，level记录层次
+	q[++rear]=root;
+	while(front!=rear){
+		node* p=q[++front];
+		v[level].push_back(p->v);
+		if(p->lchild!=NULL) q[++rear]=p->lchild;
+		if(p->rchild!=NULL) q[++rear]=p->rchild;
+		if(front==last){	//一旦本层访问完毕，更新last和level
+			last=rear;
+			level++;
+		}
+	}
+	for(int i=0;i<level;i++){		
+		if(i%2==0){							//偶数层逆序输出
+			for(int j=v[i].size()-1;j>=0;j--){
+				if(v[i][j]!=root->v) printf(" ");
+				printf("%d",v[i][j]);
+			}
+		}else{								//奇数层正序输出
+			for(int j=0;j<v[i].size();j++){
+				if(v[i][j]!=root->v) printf(" ");
+				printf("%d",v[i][j]);
+			}
+		}
+	}
+}
+int main()
+{
+	scanf("%d",&n);
+	for(int i=0;i<n;i++)
+		scanf("%d",&in[i]);
+	for(int i=0;i<n;i++)
+		scanf("%d",&post[i]);
+	node* root=NULL;
+	root=Create(0,n-1,0,n-1);
+	BFS(root);
+	return 0;
+}
