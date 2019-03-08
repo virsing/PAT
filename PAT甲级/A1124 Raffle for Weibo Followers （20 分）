@@ -1,0 +1,58 @@
+John got a full mark on PAT. He was so happy that he decided to hold a raffle（抽奖） for his followers on Weibo -- that is, he would select winners from every N followers who forwarded his post, and give away gifts. Now you are supposed to help him generate the list of winners.
+
+Input Specification:
+
+Each input file contains one test case. For each case, the first line gives three positive integers M (≤ 1000), N and S, being the total number of forwards, the skip number of winners, and the index of the first winner (the indices start from 1). Then M lines follow, each gives the nickname (a nonempty string of no more than 20 characters, with no white space or return) of a follower who has forwarded John's post.
+
+Note: it is possible that someone would forward more than once, but no one can win more than once. Hence if the current candidate of a winner has won before, we must skip him/her and consider the next one.
+
+Output Specification:
+
+For each case, print the list of winners in the same order as in the input, each nickname occupies a line. If there is no winner yet, print Keep going... instead.
+
+Sample Input 1:
+
+9 3 2Imgonnawin!PickMePickMeMeMeeeLookHereImgonnawin!TryAgainAgainTryAgainAgainImgonnawin!TryAgainAgain
+
+Sample Output 1:
+
+PickMeImgonnawin!TryAgainAgain
+
+Sample Input 2:
+
+2 3 5Imgonnawin!PickMe
+
+Sample Output 2:
+
+Keep going...
+
+
+题意：给出一串微博转发名单，让你找出其中获奖的id，从给定的位置s开始，每隔n个id抽取一名获奖，如果有重复转发的，则顺次去下一次获奖。
+
+思路：首先把所有昵称读入到字符串数组中，然后从给定的位置开始输出获奖id，为了去重可以使用map来做哈希操作。
+
+参考代码：
+--------------------- 
+#include<cstdio>
+#include<string>
+#include<iostream>
+#include<unordered_map>
+using namespace std;
+int m,n,s,idx=1;
+unordered_map<string,int> mp;
+string  ans[1010];
+int main()
+{
+	scanf("%d%d%d",&m,&n,&s);
+	for(int i=1;i<=m;i++)
+		cin>>ans[i];
+	idx=s;
+	while(idx<=m){
+		while(idx<=m&&mp.count(ans[idx])==1) idx++;
+		mp[ans[idx]]=1;
+		cout<<ans[idx]<<endl;
+		idx+=n;
+	}
+	if(mp.size()==0) cout<<"Keep going..."<<endl;
+	return 0;
+}
