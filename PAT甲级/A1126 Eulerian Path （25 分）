@@ -1,0 +1,82 @@
+In graph theory, an Eulerian path is a path in a graph which visits every edge exactly once. Similarly, an Eulerian circuit is an Eulerian path which starts and ends on the same vertex. They were first discussed by Leonhard Euler while solving the famous Seven Bridges of Konigsberg problem in 1736. It has been proven that connected graphs with all vertices of even degree have an Eulerian circuit, and such graphs are called Eulerian. If there are exactly two vertices of odd degree, all Eulerian paths start at one of them and end at the other. A graph that has an Eulerian path but not an Eulerian circuit is called semi-Eulerian. (Cited from https://en.wikipedia.org/wiki/Eulerian_path)
+
+Given an undirected graph, you are supposed to tell if it is Eulerian, semi-Eulerian, or non-Eulerian.
+
+Input Specification:
+
+Each input file contains one test case. Each case starts with a line containing 2 numbers N (≤ 500), and M, which are the total number of vertices, and the number of edges, respectively. Then M lines follow, each describes an edge by giving the two ends of the edge (the vertices are numbered from 1 to N).
+
+Output Specification:
+
+For each test case, first print in a line the degrees of the vertices in ascending order of their indices. Then in the next line print your conclusion about the graph -- either Eulerian, Semi-Eulerian, or Non-Eulerian. Note that all the numbers in the first line must be separated by exactly 1 space, and there must be no extra space at the beginning or the end of the line.
+
+Sample Input 1:
+
+7 125 71 21 32 32 43 45 27 66 34 56 45 6
+
+Sample Output 1:
+
+2 4 4 4 4 4 2Eulerian
+
+Sample Input 2:
+
+6 101 21 32 32 43 45 26 34 56 45 6
+
+Sample Output 2:
+
+2 4 4 4 3 3Semi-Eulerian
+
+Sample Input 3:
+
+5 81 22 55 44 11 33 23 45 3
+
+Sample Output 3:
+
+3 3 4 3 3Non-Eulerian
+
+题意：给出一个无向图，让你输出每个顶点的度，然后再输出它是欧拉环路还是半欧拉环路还是非欧拉环路。
+
+欧拉环路顶充要条件是：连通图， 所有顶点度为偶数
+
+半欧拉环路的充要条件：连通图，仅有两个顶点度为奇数
+
+思路：首先在输入边时，记录顶点的度，在统计度为奇数和偶数的顶点个数，再对图执行DFS，并统计访问的顶点，然后根据欧拉环路和半欧拉环路的条件判断结果。
+
+参考代码：
+--------------------- 
+#include<cstdio>
+#include<algorithm>
+using namespace std;
+int G[510][510],n,m,degree[510],vis[510];
+void DFS(int u,int& V_cnt){
+	vis[u]=1;
+	V_cnt++;
+	for(int v=1;v<=n;v++)
+		if(!vis[v]&&G[u][v]==1)
+			DFS(v,V_cnt);
+}
+int main()
+{
+	int odd=0,even=0,V_cnt=0;	//odd，even分别统计度为奇数和偶数的节点个数，Vcnt统计遍历时访问的结点个数
+	scanf("%d%d",&n,&m);
+	for(int i=0;i<m;i++){
+		int u,v;
+		scanf("%d%d",&u,&v);
+		G[u][v]=G[v][u]=1;
+		degree[u]++;
+		degree[v]++;
+
+	}
+	for(int i=1;i<=n;i++){
+		if(degree[i]%2==0) 
+			even++;
+		else odd++;
+		if(i!=1) printf(" ");
+		printf("%d",degree[i]);
+	}
+	DFS(1,V_cnt);
+	if(V_cnt==n&&even==n) printf("\nEulerian\n");
+	else if(V_cnt==n&&odd==2) printf("\nSemi-Eulerian\n");
+	else printf("\nNon-Eulerian\n");
+	return 0;
+}
