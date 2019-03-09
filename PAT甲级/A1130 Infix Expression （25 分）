@@ -1,0 +1,80 @@
+Given a syntax tree (binary), you are supposed to output the corresponding infix expression, with parentheses reflecting the precedences of the operators.
+
+Input Specification:
+
+Each input file contains one test case. For each case, the first line gives a positive integer N (≤ 20) which is the total number of nodes in the syntax tree. Then N lines follow, each gives the information of a node (the i-th line corresponds to the i-th node) in the format:
+
+data left_child right_child
+
+
+where data is a string of no more than 10 characters, left_child and right_child are the indices of this node's left and right children, respectively. The nodes are indexed from 1 to N. The NULL link is represented by −1. The figures 1 and 2 correspond to the samples 1 and 2, respectively.
+
+
+			
+		Figure 1
+			Figure 2
+		Output Specification:
+
+For each case, print in a line the infix expression, with parentheses reflecting the precedences of the operators. Note that there must be no extra parentheses for the final expression, as is shown by the samples. There must be no space between any symbols.
+
+Sample Input 1:
+
+8* 8 7a -1 -1* 4 1+ 2 5b -1 -1d -1 -1- -1 6c -1 -1
+
+Sample Output 1:
+
+(a+b)*(c*(-d))
+
+
+Sample Input 2:
+
+82.35 -1 -1* 6 1- -1 4% 7 8+ 2 3a -1 -1str -1 -1871 -1 -1
+
+Sample Output 2:
+
+(a*2.35)+(-(str%871))
+
+
+题意：给出一个二叉树存储的表达式，让你输出其中缀表达式，注意，除根结点外的其他非叶节点都要加括号。
+
+思路：首先建立一棵数组存储的二叉树，然后找出根结点（没在孩子节点中出现过的节点），再执行中序遍历这棵树，并按要求输出括号即可。
+
+参考代码：
+--------------------- 
+#include<cstdio>
+#include<string>
+#include<iostream>
+#include<algorithm>
+using namespace std;
+int n,hasht[25],root=1;	//用hasht寻找根结点
+struct node{
+	string data;
+	int lchild,rchild;
+}T[25];
+void inOrder(int p){
+	if(p==-1) return;
+	if(p!=root&&(T[p].lchild!=-1||T[p].rchild!=-1))		//如果当前结点不是根节点和叶结点，加括号
+		cout<<"(";
+	inOrder(T[p].lchild);
+	cout<<T[p].data;
+	inOrder(T[p].rchild);
+	if(p!=root&&(T[p].lchild!=-1||T[p].rchild!=-1))		//如果当前结点不是根节点和叶结点，加括号
+		cout<<")";
+}
+int main()
+{
+	scanf("%d",&n);
+	for(int i=1;i<=n;i++){
+		string s;
+		int l,r;
+		cin>>s>>l>>r;
+		T[i].data=s;
+		T[i].lchild=l;
+		T[i].rchild=r;
+		if(l!=-1) hasht[l]=1;
+		if(r!=-1) hasht[r]=1;
+	}
+	while(root<=n&&hasht[root]==1) root++;
+	inOrder(root);
+	return 0;
+}
