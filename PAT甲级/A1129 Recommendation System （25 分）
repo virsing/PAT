@@ -1,0 +1,68 @@
+Recommendation system predicts the preference that a user would give to an item. Now you are asked to program a very simple recommendation system that rates the user's preference by the number of times that an item has been accessed by this user.
+
+Input Specification:
+
+Each input file contains one test case. For each test case, the first line contains two positive integers: N (≤ 50,000), the total number of queries, and K (≤ 10), the maximum number of recommendations the system must show to the user. Then given in the second line are the indices of items that the user is accessing -- for the sake of simplicity, all the items are indexed from 1 to N. All the numbers in a line are separated by a space.
+
+Output Specification:
+
+For each case, process the queries one by one. Output the recommendations for each query in a line in the format:
+
+query: rec[1] rec[2] ... rec[K]
+
+
+where query is the item that the user is accessing, and rec[i] (i=1, ... K) is the i-th item that the system recommends to the user. The first K items that have been accessed most frequently are supposed to be recommended in non-increasing order of their frequencies. If there is a tie, the items will be ordered by their indices in increasing order.
+
+Note: there is no output for the first item since it is impossible to give any recommendation at the time. It is guaranteed to have the output for at least one query.
+
+Sample Input:
+
+12 33 5 7 5 5 3 2 1 8 3 8 12
+
+Sample Output:
+
+5: 37: 3 55: 3 5 75: 5 3 73: 5 3 72: 5 3 71: 5 3 28: 5 3 13: 5 3 18: 3 5 112: 3 5 8
+
+题意：给出n个商品的id，最大推荐数k，让你做一个推荐系统， 为每一个用户正在浏览的商品，推荐其他商品（第一个商品不用推荐），推荐系统按用户之前浏览的商品频率降序推荐，如果有浏览频率相同的商品，则按照id升序排列。
+
+思路：使用数组a[]记录商品的id，vis[]记录商品的访问次数，r[]记录推荐商品列表，每次输入商品后都更新推荐列表，并按要求对推荐列表排序。
+
+参考代码：
+--------------------- 
+#include<cstdio>
+#include<algorithm>
+using namespace std;
+int n,k,a[50010],vis[50010],mx=0;	//a存放数据，vis存放访问次数
+int r[15];	//r存放推荐的id
+bool cmp(int a,int b){		//排序函数，按访问次数降序排列，如果次数相同，按id升序排列
+	if(vis[a]!=vis[b]) return vis[a]>vis[b];
+	else if(vis[a]==vis[b]) return a<b;
+}
+int main()
+{
+	scanf("%d%d",&n,&k);
+	for(int i=1;i<=n;i++){
+		scanf("%d",&a[i]);
+		if(i!=1){
+			int num=0;
+			for(int j=1;j<=k;j++)	//统计推荐id的个数
+				if(r[j]) num++;
+			printf("%d:",a[i]);
+			for(int j=1;j<=k&&num;j++){	//输出推荐的id
+				printf(" %d",r[j]);
+				num--;
+			}
+			printf("\n");		
+		}
+		vis[a[i]]++;
+		bool flag=false;	//用flag标记推荐名单里是否已经有a[i]了，若有则flag=ture
+		for(int j=1;j<=k;j++)
+			if(r[j]==a[i])
+				flag=true;
+		//当推荐列表里没有a[i],且a[i]的访问频率大于最后一个推荐商品，或者频率相同但a[i]的id比最后一个更小，令a[i]取代最后一个推荐id
+		if(((vis[a[i]]>vis[r[k]])||(vis[a[i]]==vis[r[k]]&&a[i]<r[k]))&&!flag) 
+			r[k]=a[i];		
+		sort(r+1,r+k+1,cmp);
+	}
+	return 0;
+}
