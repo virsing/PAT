@@ -1,0 +1,65 @@
+A vertex cover of a graph is a set of vertices such that each edge of the graph is incident to at least one vertex of the set. Now given a graph with several vertex sets, you are supposed to tell if each of them is a vertex cover or not.
+
+Input Specification:
+
+Each input file contains one test case. For each case, the first line gives two positive integers N and M (both no more than 10​4​​), being the total numbers of vertices and the edges, respectively. Then M lines follow, each describes an edge by giving the indices (from 0 to N−1) of the two ends of the edge.
+
+After the graph, a positive integer K (≤ 100) is given, which is the number of queries. Then K lines of queries follow, each in the format:
+
+N​v​​ v[1] v[2]⋯v[N​v​​]
+
+where N​v​​ is the number of vertices in the set, and v[i]'s are the indices of the vertices.
+
+Output Specification:
+
+For each query, print in a line Yes if the set is a vertex cover, or No if not.
+
+Sample Input:
+
+10 118 76 84 58 48 11 21 49 89 11 02 454 0 3 8 46 6 1 7 5 4 93 1 8 42 2 87 9 8 7 6 5 4 2
+
+Sample Output:
+
+NoYesYesNoNo
+
+题意：定义顶点覆盖，为一个顶点集合，这个集合包含图中任意一条边至少一个顶点，现在给你一个图和若干个顶点集合，让你判断这些集合是否为顶点覆盖。
+
+思路：首先把所有边保存下来，接下来逐个集合检查，判断集合内顶点是否包含任意边至少一个顶点。
+
+参考代码： 
+--------------------- 
+#include<cstdio>
+#include<vector>
+#include<cstring>
+using namespace std;
+int n,m,q,vis[10010];
+struct node{
+	int u,v;
+};
+vector<node> edge(10010);
+int main()
+{
+	scanf("%d%d",&n,&m);
+	for(int i=0;i<m;i++)
+		scanf("%d%d",&edge[i].u,&edge[i].v);
+	scanf("%d",&q);
+	for(int i=0;i<q;i++){
+		int num,t;
+		memset(vis,0,sizeof(vis));
+		scanf("%d",&num);
+		for(int j=0;j<num;j++){
+			scanf("%d",&t);
+			vis[t]=1;
+		}
+		bool flag=true;	//flag标记是否包含全部边的至少一个顶点
+		for(int j=0;j<m&&flag;j++){
+			int u=edge[j].u;
+			int v=edge[j].v;
+			if(!vis[u]&&!vis[v])
+				flag=false;
+		}
+		if(flag) printf("Yes\n");
+		else printf("No\n");
+	}
+	return 0;
+}
