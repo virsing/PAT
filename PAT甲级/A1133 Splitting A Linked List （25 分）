@@ -1,0 +1,66 @@
+Given a singly linked list, you are supposed to rearrange its elements so that all the negative values appear before all of the non-negatives, and all the values in [0, K] appear before all those greater than K. The order of the elements inside each class must not be changed. For example, given the list being 18→7→-4→0→5→-6→10→11→-2 and K being 10, you must output -4→-6→-2→7→0→5→10→18→11.
+
+Input Specification:
+
+Each input file contains one test case. For each case, the first line contains the address of the first node, a positive N (≤10​5​​) which is the total number of nodes, and a positive K (≤10​3​​). The address of a node is a 5-digit nonnegative integer, and NULL is represented by −1.
+
+Then N lines follow, each describes a node in the format:
+
+Address Data Next
+
+
+where Address is the position of the node, Data is an integer in [−10​5​​,10​5​​], and Next is the position of the next node. It is guaranteed that the list is not empty.
+
+Output Specification:
+
+For each case, output in order (from beginning to the end of the list) the resulting linked list. Each node occupies a line, and is printed in the same format as in the input.
+
+Sample Input:
+
+00100 9 1023333 10 2777700000 0 9999900100 18 1230968237 -6 2333333218 -4 0000048652 -2 -199999 5 6823727777 11 4865212309 7 33218
+
+Sample Output:
+
+33218 -4 6823768237 -6 4865248652 -2 1230912309 7 0000000000 0 9999999999 5 2333323333 10 0010000100 18 2777727777 11 -1
+
+题意：给出一个链表，再给出一个k值，让你按照链表结点值<0,[0,k],>k分三类，并输出。
+
+思路：首先建立结构体存储链表结点，建立三个vector数组，分别存放三个范围的数据，等数据输入完毕后，逐个遍历链表，分类存放到对应vector中，最后把三个vector合并到一起，输出即可。 
+
+参考代码：
+--------------------- 
+#include<cstdio>
+#include<algorithm>
+#include<vector>
+using namespace std;
+struct node{
+	int addr,data,next;
+}L[100010];
+vector<node> v1,v2,v3;	//v1存放负值，v2存放0-k数据，v3存放大于k的数
+int n,st,k,addr,data,next,p;
+int main()
+{
+	scanf("%d%d%d",&st,&n,&k);
+	for(int i=0;i<n;i++){
+		scanf("%d",&addr);
+		scanf("%d%d",&L[addr].data,&L[addr].next);
+		L[addr].addr=addr;
+	}
+	p=st;
+	while(p!=-1){
+		if(L[p].data<0) v1.push_back(L[p]);
+		else if(L[p].data>k) v3.push_back(L[p]);
+		else v2.push_back(L[p]);
+		p=L[p].next;
+	}
+	for(int i=0;i<v2.size();i++)
+		v1.push_back(v2[i]);
+	for(int i=0;i<v3.size();i++)
+		v1.push_back(v3[i]);
+	for(int i=0;i<v1.size();i++){
+		if(i==0) printf("%05d %d ",v1[i].addr,v1[i].data);
+		else printf("%05d\n%05d %d ",v1[i].addr,v1[i].addr,v1[i].data);
+	}
+	printf("-1\n");
+	return 0;
+}
