@@ -1,0 +1,48 @@
+Cutting an integer means to cut a K digits lone integer Z into two integers of (K/2) digits long integers A and B. For example, after cutting Z = 167334, we have A = 167 and B = 334. It is interesting to see that Z can be devided by the product of A and B, as 167334 / (167 × 334) = 3. Given an integer Z, you are supposed to test if it is such an integer.
+
+Input Specification:
+
+Each input file contains one test case. For each case, the first line gives a positive integer N (≤ 20). Then N lines follow, each gives an integer Z (10 ≤ Z <2​31​​). It is guaranteed that the number of digits of Z is an even number.
+
+Output Specification:
+
+For each case, print a single line Yes if it is such a number, or No if not.
+
+Sample Input:
+
+3167334233312345678
+
+Sample Output:
+
+YesNoNo
+
+题意：任给n个正整数，问你对每个正整数s，如果把他分成两半，高位一半a和低位一半b，能否使这个正整数s整除（a*b），如果可以输出yes，否则输出no。题目保证s的位数为偶数。
+
+思路：字符串形式读入每个数，然后把它分高位和地位两部分，再整除其乘积判断结果。
+
+参考代码：
+--------------------- 
+#include<cstdio>
+#include<string>
+#include<iostream>
+using namespace std;
+bool judge(string s){
+	int n=stoi(s),k=s.size()/2,i=1,a,b;
+	while(k--) i*=10;
+	a=n/i;
+	b=n%i;
+	if(a!=0&&b!=0&&n%(a*b)==0) return true;
+	return false;
+}
+int main()
+{
+	int n;
+	string s;
+	scanf("%d",&n);
+	for(int i=0;i<n;i++){
+		cin>>s;
+		if(judge(s)) printf("Yes\n");
+		else printf("No\n");
+	}
+	return 0;
+}
