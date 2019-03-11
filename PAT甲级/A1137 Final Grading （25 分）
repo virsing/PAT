@@ -1,0 +1,100 @@
+For a student taking the online course "Data Structures" on China University MOOC (http://www.icourse163.org/), to be qualified for a certificate, he/she must first obtain no less than 200 points from the online programming assignments, and then receive a final grade no less than 60 out of 100. The final grade is calculated by G=(Gmid−term×40%+Gfinal×60%)G = (G_{mid-term}\times 40\% + G_{final}\times 60\%)G=(G​mid−term​​×40%+G​final​​×60%) if Gmid−term>GfinalG_{mid-term} > G_{final}G​mid−term​​>G​final​​, or GfinalG_{final}G​final​​ will be taken as the final grade GGG. Here Gmid−termG_{mid-term}G​mid−term​​ and GfinalG_{final}G​final​​ are the student's scores of the mid-term and the final exams, respectively.
+
+The problem is that different exams have different grading sheets. Your job is to write a program to merge all the grading sheets into one.
+
+Input Specification:
+
+Each input file contains one test case. For each case, the first line gives three positive integers: P , the number of students having done the online programming assignments; M, the number of students on the mid-term list; and N, the number of students on the final exam list. All the numbers are no more than 10,000.
+
+Then three blocks follow. The first block contains P online programming scores GpG_pG​p​​'s; the second one contains M mid-term scores Gmid−termG_{mid-term}G​mid−term​​'s; and the last one contains N final exam scores GfinalG_{final}G​final​​'s. Each score occupies a line with the format: StudentID Score, where StudentID is a string of no more than 20 English letters and digits, and Score is a nonnegative integer (the maximum score of the online programming is 900, and that of the mid-term and final exams is 100).
+
+Output Specification:
+
+For each case, print the list of students who are qualified for certificates. Each student occupies a line with the format:
+
+StudentID GpG_pG​p​​ Gmid−termG_{mid-term}G​mid−term​​ GfinalG_{final}G​final​​ GGG
+
+If some score does not exist, output "−1-1−1" instead. The output must be sorted in descending order of their final grades (GGG must be rounded up to an integer). If there is a tie, output in ascending order of their StudentID's. It is guaranteed that the StudentID's are all distinct, and there is at least one qullified student.
+
+Sample Input:
+
+6 6 701234 880a1903 199ydjh2 200wehu8 300dx86w 220missing 400ydhfu77 99wehu8 55ydjh2 98dx86w 88a1903 8601234 39ydhfu77 88a1903 6601234 58wehu8 84ydjh2 82missing 99dx86w 81
+
+Sample Output:
+
+missing 400 -1 99 99ydjh2 200 98 82 88dx86w 220 88 81 84wehu8 300 55 84 84
+
+题意：给出p个学生的编程成绩，m个学生的期中考试成绩，n个学生的期末考试成绩，让你打印最终合格学生的成绩名单。合格的成绩有两个要求，一是编程成绩不低于200，二是最终成绩不低于60.
+
+思路：建立学生结构体，各成绩赋初值为-1.
+
+ 
+
+struct node{
+  string id;
+  int p_score,Gmid,Gfinal,G;
+  node(int p_=-1,int Gm=-1,int Gf=-1):p_score(p_),Gmid(Gm),Gfinal(Gf){}
+};
+
+由于最终合格的学生有两个要求，一是编程成绩不低于200，二是最终成绩不低于60。因此，首先使用一个map<string,int>，标记编程成绩大于200的学生在vector列表中index， 然后在输入期中和期末成绩时，若该学生的编程成绩合格再保存其期中期末成绩，最后把合格的学生push到另外一个vector中，按要求排序输出。
+
+参考代码：
+--------------------- 
+#include<cstdio>
+#include<vector>
+#include<string>
+#include<iostream>
+#include<algorithm>
+#include<unordered_map>
+using namespace std;
+int p,m,n;
+unordered_map<string,int> mp;	//mp存放编程成绩大于等于200的学生对应下标，
+struct node{
+	string id;
+	int p_score,Gmid,Gfinal,G;
+	node(int p_=-1,int Gm=-1,int Gf=-1):p_score(p_),Gmid(Gm),Gfinal(Gf){}
+};
+vector<node> v(10010),ans;
+bool cmp(node a,node b){
+	if(a.G!=b.G) return a.G>b.G;
+	else return a.id<b.id;
+}
+int main()
+{
+	string s;
+	int score,idx=0;
+	scanf("%d%d%d",&p,&m,&n);
+	for(int i=0;i<p;i++){
+		cin>>s>>score;
+		if(score>=200){
+			mp[s]=idx;		//mp存放学生在vector中的下标
+			v[idx].id=s;
+			v[idx].p_score=score;
+			idx++;
+		}
+	}
+	for(int i=0;i<m;i++){
+		cin>>s>>score;
+		if(mp.find(s)!=mp.end()){
+			v[mp[s]].Gmid=score;
+		}
+	}
+	for(int i=0;i<n;i++){
+		cin>>s>>score;
+		if(mp.find(s)!=mp.end()){
+			idx=mp[s];
+			v[idx].Gfinal=score;
+			if(v[idx].Gmid>v[idx].Gfinal)
+				v[idx].G=(int)(0.4*v[idx].Gmid+0.6*v[idx].Gfinal+0.5);
+			else 
+				v[idx].G=v[idx].Gfinal;
+			if(v[idx].G>=60)
+				ans.push_back(v[idx]);
+		}
+	}
+	sort(ans.begin(),ans.end(),cmp);
+	for(int i=0;i<ans.size();i++)
+		cout<<ans[i].id<<" "<<ans[i].p_score<<" "<<ans[i].Gmid<<" "<<ans[i].Gfinal<<" "<<ans[i].G<<endl;
+	return 0;
+}
+
