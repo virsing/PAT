@@ -1,0 +1,96 @@
+对于在中国大学MOOC（http://www.icourse163.org/ ）学习“数据结构”课程的学生，想要获得一张合格证书，必须首先获得不少于200分的在线编程作业分，然后总评获得不少于60分（满分100）。总评成绩的计算公式为 G=(Gmid−term×40%+Gfinal×60%)G = (G_{mid-term}\times 40\% + G_{final}\times 60\%)G=(G​mid−term​​×40%+G​final​​×60%)，如果 Gmid−term>GfinalG_{mid-term} > G_{final}G​mid−term​​>G​final​​；否则总评 GGG 就是 GfinalG_{final}G​final​​。这里 Gmid−termG_{mid-term}G​mid−term​​ 和 GfinalG_{final}G​final​​ 分别为学生的期中和期末成绩。
+
+现在的问题是，每次考试都产生一张独立的成绩单。本题就请你编写程序，把不同的成绩单合为一张。
+
+输入格式：
+
+输入在第一行给出3个整数，分别是 P（做了在线编程作业的学生数）、M（参加了期中考试的学生数）、N（参加了期末考试的学生数）。每个数都不超过10000。
+
+接下来有三块输入。第一块包含 P 个在线编程成绩 GpG_pG​p​​；第二块包含 M 个期中考试成绩 Gmid−termG_{mid-term}G​mid−term​​；第三块包含 N 个期末考试成绩 GfinalG_{final}G​final​​。每个成绩占一行，格式为：学生学号 分数。其中学生学号为不超过20个字符的英文字母和数字；分数是非负整数（编程总分最高为900分，期中和期末的最高分为100分）。
+
+输出格式：
+
+打印出获得合格证书的学生名单。每个学生占一行，格式为：
+
+学生学号 GpG_pG​p​​ Gmid−termG_{mid-term}G​mid−term​​ GfinalG_{final}G​final​​ GGG
+
+如果有的成绩不存在（例如某人没参加期中考试），则在相应的位置输出“−1-1−1”。输出顺序为按照总评分数（四舍五入精确到整数）递减。若有并列，则按学号递增。题目保证学号没有重复，且至少存在1个合格的学生。
+
+输入样例：
+
+6 6 701234 880a1903 199ydjh2 200wehu8 300dx86w 220missing 400ydhfu77 99wehu8 55ydjh2 98dx86w 88a1903 8601234 39ydhfu77 88a1903 6601234 58wehu8 84ydjh2 82missing 99dx86w 81
+
+输出样例：
+
+missing 400 -1 99 99ydjh2 200 98 82 88dx86w 220 88 81 84wehu8 300 55 84 84
+
+思路：建立学生结构体，各成绩赋初值为-1.
+
+struct node{	
+  string id;	
+  int p_score,Gmid,Gfinal,G;	
+  node(int p_=-1,int Gm=-1,int Gf=-1):p_score(p_),Gmid(Gm),Gfinal(Gf){}
+};
+
+由于最终合格的学生有两个要求，一是编程成绩不低于200，二是最终成绩不低于60。因此，首先使用一个map<string,int>，标记编程成绩大于200的学生在vector列表中index， 然后在输入期中和期末成绩时，若该学生的编程成绩合格再保存其期中期末成绩，最后把合格的学生push到另外一个vector中，按要求排序输出。
+
+参考代码：
+--------------------- 
+#include<cstdio>
+#include<vector>
+#include<string>
+#include<iostream>
+#include<algorithm>
+#include<unordered_map>
+using namespace std;
+int p,m,n;
+unordered_map<string,int> mp;	//mp存放编程成绩大于等于200的学生对应下标，
+struct node{
+	string id;
+	int p_score,Gmid,Gfinal,G;
+	node(int p_=-1,int Gm=-1,int Gf=-1):p_score(p_),Gmid(Gm),Gfinal(Gf){}
+};
+vector<node> v(10010),ans;
+bool cmp(node a,node b){
+	if(a.G!=b.G) return a.G>b.G;
+	else return a.id<b.id;
+}
+int main()
+{
+	string s;
+	int score,idx=0;
+	scanf("%d%d%d",&p,&m,&n);
+	for(int i=0;i<p;i++){
+		cin>>s>>score;
+		if(score>=200){
+			mp[s]=idx;		//mp存放学生在vector中的下标
+			v[idx].id=s;
+			v[idx].p_score=score;
+			idx++;
+		}
+	}
+	for(int i=0;i<m;i++){
+		cin>>s>>score;
+		if(mp.find(s)!=mp.end()){
+			v[mp[s]].Gmid=score;
+		}
+	}
+	for(int i=0;i<n;i++){
+		cin>>s>>score;
+		if(mp.find(s)!=mp.end()){
+			idx=mp[s];
+			v[idx].Gfinal=score;
+			if(v[idx].Gmid>v[idx].Gfinal)
+				v[idx].G=(int)(0.4*v[idx].Gmid+0.6*v[idx].Gfinal+0.5);
+			else 
+				v[idx].G=v[idx].Gfinal;
+			if(v[idx].G>=60)
+				ans.push_back(v[idx]);
+		}
+	}
+	sort(ans.begin(),ans.end(),cmp);
+	for(int i=0;i<ans.size();i++)
+		cout<<ans[i].id<<" "<<ans[i].p_score<<" "<<ans[i].Gmid<<" "<<ans[i].Gfinal<<" "<<ans[i].G<<endl;
+	return 0;
+}
+
