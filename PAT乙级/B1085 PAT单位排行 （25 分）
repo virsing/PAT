@@ -1,0 +1,97 @@
+每次 PAT 考试结束后，考试中心都会发布一个考生单位排行榜。本题就请你实现这个功能。
+
+输入格式：
+
+输入第一行给出一个正整数 N（≤10​5​​），即考生人数。随后 N 行，每行按下列格式给出一个考生的信息：
+
+准考证号 得分 学校
+
+
+其中准考证号是由 6 个字符组成的字符串，其首字母表示考试的级别：B代表乙级，A代表甲级，T代表顶级；得分是 [0, 100] 区间内的整数；学校是由不超过 6 个英文字母组成的单位码（大小写无关）。注意：题目保证每个考生的准考证号是不同的。
+
+输出格式：
+
+首先在一行中输出单位个数。随后按以下格式非降序输出单位的排行榜：
+
+排名 学校 加权总分 考生人数
+
+
+其中排名是该单位的排名（从 1 开始）；学校是全部按小写字母输出的单位码；加权总分定义为乙级总分/1.5 + 甲级总分 + 顶级总分*1.5的整数部分；考生人数是该属于单位的考生的总人数。
+
+学校首先按加权总分排行。如有并列，则应对应相同的排名，并按考生人数升序输出。如果仍然并列，则按单位码的字典序输出。
+
+输入样例：
+
+10A57908 85 AuB57908 54 LanXA37487 60 auT28374 67 CMUT32486 24 hypuA66734 92 cmuB76378 71 AUA47780 45 lanxA72809 100 pkuA03274 45 hypu
+
+输出样例：
+
+51 cmu 192 21 au 192 33 pku 100 14 hypu 81 24 lanx 81 2
+
+思路：为了方便排序，使用vector存放学校的id，分数等信息，结构体如下：
+
+struct node{	string school;	int cnt,Bscore,Ascore,Tscore,score;    //分别对应学生人数，乙级总分，甲级总分，顶级总分和最终加权分};
+
+ 使用map<string,int>来存放学校在vector中的下标idx，使用函数getIdx（）来获取下标，分数输入完毕后，便利vector求加权分，然后按要求排序，输出。
+
+参考代码：
+--------------------- 
+#include<cstdio>
+#include<vector>
+#include<cstring>
+#include<string>
+#include<iostream>
+#include<algorithm>
+#include<unordered_map>
+using namespace std;
+unordered_map<string,int> mp;
+struct node{
+	string school;
+	int cnt,Bscore,Ascore,Tscore,score;
+};
+node a[100010];
+int n,idx=0;
+int getIdx(string school){
+	if(mp.find(school)==mp.end()){
+		mp[school]=idx;
+		return idx++;
+	}else return mp[school];
+}
+bool cmp(node a,node b){
+	if(a.score!=b.score)
+		return a.score>b.score;
+	else if(a.cnt!=b.cnt)
+		return a.cnt<b.cnt;
+	else return a.school<b.school;
+}
+int main()
+{
+	scanf("%d",&n);
+	int score;
+	string stu_id,school;
+	for(int i=0;i<n;i++){
+		cin>>stu_id>>score>>school;
+		for(int i=0;i<school.size();i++){
+			if(school[i]>='A'&&school[i]<='Z')	//统一校名为小写字母
+				school[i]+=32;
+		}
+		int id=getIdx(school);			//转换校名为对应idx
+		if(stu_id[0]=='B') a[id].Bscore+=score;
+		if(stu_id[0]=='T') a[id].Tscore+=score;
+		if(stu_id[0]=='A') a[id].Ascore+=score;
+		a[id].school=school;
+		a[id].cnt++;
+	}
+	for(int i=0;i<idx;i++)					//求总加权分
+		a[i].score=(int)(a[i].Bscore/1.5+a[i].Ascore+a[i].Tscore*1.5);
+	sort(a,a+idx,cmp);
+	cout<<idx<<endl;
+	int Rank=1;		//接下来输出排名
+	cout<<"1 "<<a[0].school<<" "<<a[0].score<<" "<<a[0].cnt<<endl;
+	for(int i=1;i<idx;i++){
+		if(a[i].score!=a[i-1].score) 
+			Rank=i+1;		
+		cout<<Rank<<" "<<a[i].school<<" "<<(int)a[i].score<<" "<<a[i].cnt<<endl;	//注意分数要输出整型
+	}
+	return 0;
+}
