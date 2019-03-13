@@ -1,0 +1,74 @@
+A clique is a subset of vertices of an undirected graph such that every two distinct vertices in the clique are adjacent. A maximal clique is a clique that cannot be extended by including one more adjacent vertex. (Quoted from https://en.wikipedia.org/wiki/Clique_(graph_theory))
+
+Now it is your job to judge if a given subset of vertices can form a maximal clique.
+
+Input Specification:
+
+Each input file contains one test case. For each case, the first line gives two positive integers Nv (≤ 200), the number of vertices in the graph, and Ne, the number of undirected edges. Then Ne lines follow, each gives a pair of vertices of an edge. The vertices are numbered from 1 to Nv.
+
+After the graph, there is another positive integer M (≤ 100). Then M lines of query follow, each first gives a positive number K (≤ Nv), then followed by a sequence of K distinct vertices. All the numbers in a line are separated by a space.
+
+Output Specification:
+
+For each of the M queries, print in a line Yes if the given subset of vertices can form a maximal clique; or if it is a clique but not a maximal clique, print Not Maximal; or if it is not a clique at all, print Not a Clique.
+
+Sample Input:
+
+8 105 67 86 43 64 52 38 22 75 33 464 5 4 3 63 2 8 72 2 31 13 4 3 63 3 2 1
+
+Sample Output:
+
+YesYesYesYesNot MaximalNot a Clique
+
+题意：定义clique为：给定顶点集合内，任意两个顶点均有边相连。现给定一个无向图，再给出q个定点集合，问你这些集合是否是clique，如果是最大clique，输出yes，如果不是最大clique，但属于一个clique，输出Not maximal，否则输出，not a clique。
+
+思路：首先建立无向图 ，接下来，对每一个集合判断集合内顶点是否均有边互相连接，如果是，说明是一个clique，接下来从图中尝试寻找集合外的顶点u，如果u与给定集合内所有顶点均有边相连，说明该集合不是最大clique，否则则为最大clique，输出yes。
+
+参考代码：
+--------------------- 
+#include<cstdio>
+#include<cstring>
+using namespace std;
+int n,m,q,a[210],G[210][210];
+bool judge(int u){				//judge函数判断给定顶点u，是否与集合内所有顶点都有边相连
+	for(int v=1;v<=n;v++){
+		if(a[v]&&!G[u][v])
+			return false;
+	}
+	return true;
+}
+int main()
+{
+	scanf("%d%d",&n,&m);
+	for(int i=0;i<m;i++){
+		int u,v;
+		scanf("%d %d",&u,&v);
+		G[u][v]=G[v][u]=1;
+	}
+	scanf("%d",&q);
+	for(int i=0;i<q;i++){
+		int num,t,flag=1;
+		scanf("%d",&num);
+		memset(a,0,sizeof(a));
+		for(int j=0;j<num;j++){
+			scanf("%d",&t);
+			a[t]=1;
+		}
+		for(int u=1;u<=n&&flag;u++)        //检查集合内所有顶点是否都有边连接
+			for(int v=u+1;v<=n&&flag;v++)
+				if(a[u]&&a[v]&&G[u][v]==0)
+					flag=0;
+		if(!flag) printf("Not a Clique\n");
+		else{
+			flag=0;
+			for(int u=1;u<=n&&!flag;u++){
+				if(a[u]) continue;    //集合内顶点跳过
+				if(judge(u))
+					flag=1;
+			}
+			if(flag) printf("Not Maximal\n");
+			else printf("Yes\n");
+		}
+	}
+	return 0;
+}
