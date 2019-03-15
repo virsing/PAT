@@ -1,0 +1,67 @@
+The lowest common ancestor (LCA) of two nodes U and V in a tree is the deepest node that has both U and V as descendants.
+
+A binary search tree (BST) is recursively defined as a binary tree which has the following properties:
+
+The left subtree of a node contains only nodes with keys less than the node's key.
+	The right subtree of a node contains only nodes with keys greater than or equal to the node's key.
+	Both the left and right subtrees must also be binary search trees.
+Given any two nodes in a BST, you are supposed to find their LCA.
+
+Input Specification:
+
+Each input file contains one test case. For each case, the first line gives two positive integers: M (≤ 1,000), the number of pairs of nodes to be tested; and N (≤ 10,000), the number of keys in the BST, respectively. In the second line, N distinct integers are given as the preorder traversal sequence of the BST. Then M lines follow, each contains a pair of integer keys U and V. All the keys are in the range of int.
+
+Output Specification:
+
+For each given pair of U and V, print in a line LCA of U and V is A. if the LCA is found and A is the key. But if A is one of U and V, print X is an ancestor of Y. where X is A and Y is the other node. If U or V is not found in the BST, print in a line ERROR: U is not found. or ERROR: V is not found. or ERROR: U and V are not found..
+
+Sample Input:
+
+6 86 3 1 2 5 4 8 72 58 71 912 -30 899 99
+
+Sample Output:
+
+LCA of 2 and 5 is 3.8 is an ancestor of 7.ERROR: 9 is not found.ERROR: 12 and -3 are not found.ERROR: 0 is not found.ERROR: 99 and 99 are not found.
+
+题意：给出一棵BST树的先序序列，再给出m组顶点u，v，让你找出u和v的最近公共祖先，并按要求输出。
+
+思路： 如果先建立BST树在通过DFS求最近公共祖先，则会有几组case超时，考虑到这是一棵BST树，且给定的是先序序列，有如下特点：对于任意给定的顶点u和v，从头开始遍历该先序序列，如果当前顶点a>=u并且a<=v或者a>=v且a<=u，则可以断定a是u和v的最近公共祖先，为了防止u或v不在序列中的情况，可以使用map在输入时，做一个映射，如果u或v不在map中则不是树中的顶点。
+
+参考代码：
+--------------------- 
+#include<cstdio>
+#include<unordered_map>
+using namespace std;
+unordered_map<int,int> mp;
+int n,m,u,v,a[10010];
+int main()
+{
+	scanf("%d%d",&m,&n);
+	for(int i=0;i<n;i++){
+		scanf("%d",&a[i]);
+		mp[a[i]]=1;
+	}
+	for(int k=0;k<m;k++){
+		scanf("%d%d",&u,&v);
+		if(mp.find(u)==mp.end()&&mp.find(v)==mp.end())
+			printf("ERROR: %d and %d are not found.\n",u,v);
+		else if(mp.find(u)==mp.end())
+			printf("ERROR: %d is not found.\n",u);
+		else if(mp.find(v)==mp.end())
+			printf("ERROR: %d is not found.\n",v);
+		else{
+			bool flag=false;
+			int LCA=0;
+			for(int i=0;i<n&&!flag;i++){
+				if((a[i]>=u&&a[i]<=v)||(a[i]>=v&&a[i]<=u)){
+					LCA=a[i];
+					flag=true;
+				}
+			}
+			if(LCA==u) printf("%d is an ancestor of %d.\n",u,v);
+			else if(LCA==v) printf("%d is an ancestor of %d.\n",v,u);
+			else printf("LCA of %d and %d is %d.\n",u,v,LCA);
+		}
+	}
+	return 0;
+}
