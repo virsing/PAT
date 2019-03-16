@@ -26,7 +26,7 @@ Sample Output:
 #include<cmath>
 #include<algorithm>
 using namespace std;
-int N,m,n=0,a[10010],ans[10010][10010];
+int N,m,n=0,a[10010];
 bool cmp(int a,int b){
 	return a>b;
 }
@@ -43,6 +43,8 @@ int main()
 	m=ceil(sqrt(1.0*N));
 	while(m<N&&N%m!=0) m++;
 	n=N/m;
+	int ans[m][n];
+	memset(ans,0,sizeof(ans));
 	int up=0,down=m-1,left=0,right=n-1,k=0,i=0,j=0;
 	while(k<N){				//螺旋填充
 		while(k<N&&j<right) ans[up][j++]=a[k++];
