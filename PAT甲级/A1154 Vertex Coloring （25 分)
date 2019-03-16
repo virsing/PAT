@@ -1,0 +1,61 @@
+A proper vertex coloring is a labeling of the graph's vertices with colors such that no two vertices sharing the same edge have the same color. A coloring using at most k colors is called a (proper) k-coloring.
+
+Now you are supposed to tell if a given coloring is a proper k-coloring.
+
+Input Specification:
+
+Each input file contains one test case. For each case, the first line gives two positive integers N and M (both no more than 10​4​​), being the total numbers of vertices and edges, respectively. Then M lines follow, each describes an edge by giving the indices (from 0 to N−1) of the two ends of the edge.
+
+After the graph, a positive integer K (≤ 100) is given, which is the number of colorings you are supposed to check. Then K lines follow, each contains N colors which are represented by non-negative integers in the range of int. The i-th color is the color of the i-th vertex.
+
+Output Specification:
+
+For each coloring, print in a line k-coloring if it is a proper k-coloring for some positive k, or No if not.
+
+Sample Input:
+
+10 118 76 84 58 48 11 21 49 89 11 02 440 1 0 1 4 1 0 1 3 00 1 0 1 4 1 0 1 0 08 1 0 1 4 1 0 5 3 01 2 3 4 5 6 7 8 8 9
+
+Sample Output:
+
+4-coloringNo6-coloringNo
+
+题意：给出一个图，n个顶点，m条边，如果使用k个颜色给这个图的每一个顶点着色，使得这个图的任意一条边对应的两个顶点颜色都不相同，则称该图为：k颜色。先给出q种着色方案问你是否满足k着色方案。
+
+思路：使用结构体数组edge[]存储每一条边对应的顶点，然后使用数组color[],存储每一种着色方案，并使用map统计一共使用了多少种颜色，然后逐条边检查是否有某一条边的两个顶点颜色相同，如果有相同的则输出no，否则输出对应的k-coloring。
+
+参考代码：
+--------------------- 
+#include<cstdio>
+#include<unordered_map>
+#include<cstring>
+using namespace std;
+struct node{
+	int u,v;
+}edge[10010];
+int n,m,q,color[10010];
+int main()
+{
+	scanf("%d%d",&n,&m);
+	for(int i=0;i<m;i++)
+		scanf("%d%d",&edge[i].u,&edge[i].v);
+	scanf("%d",&q);
+	for(int i=0;i<q;i++){
+		memset(color,-1,sizeof(color));
+		unordered_map<int,int> mp;
+		bool flag=true;
+		for(int j=0;j<n;j++){
+			scanf("%d",&color[j]);
+			if(mp.count(color[j])==0)
+				mp[color[j]]=1;
+		}
+		for(int j=0;j<m&&flag;j++){
+			int u=edge[j].u,v=edge[j].v;
+			if(color[u]==color[v])
+				flag=false;
+		}
+		if(!flag) printf("No\n");
+		else printf("%d-coloring\n",mp.size());
+	}
+	return 0;
+}
