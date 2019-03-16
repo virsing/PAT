@@ -24,7 +24,7 @@
 #include<algorithm>
 #include<cmath>
 using namespace std;
-int a[10010],ans[5010][5010];
+int a[10010];
 bool cmp(int i,int j){
 	return i>j;
 }
@@ -43,6 +43,8 @@ int main()
 	while(N%m!=0){
 		m++;
 	}
+	int ans[m][n];
+	memset(ans,0,sizeof(ans));
 	int n=N/m,up=0,down=m-1,left=0,right=n-1,i=0,j=0,k=0;	//i,j标记一圈的初始位置
 	while(k<N){
 		while(k<N&&j<right)    {ans[i][j]=a[k++];j++;}
