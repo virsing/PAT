@@ -1,0 +1,90 @@
+Unlike in nowadays, the way that boys and girls expressing their feelings of love was quite subtle in the early years. When a boy A had a crush on a girl B, he would usually not contact her directly in the first place. Instead, he might ask another boy C, one of his close friends, to ask another girl D, who was a friend of both B and C, to send a message to B -- quite a long shot, isn't it? Girls would do analogously.
+
+Here given a network of friendship relations, you are supposed to help a boy or a girl to list all their friends who can possibly help them making the first contact.
+
+Input Specification:
+
+Each input file contains one test case. For each case, the first line gives two positive integers N (1 < N ≤ 300) and M, being the total number of people and the number of friendship relations, respectively. Then M lines follow, each gives a pair of friends. Here a person is represented by a 4-digit ID. To tell their genders, we use a negative sign to represent girls.
+
+After the relations, a positive integer K (≤ 100) is given, which is the number of queries. Then K lines of queries follow, each gives a pair of lovers, separated by a space. It is assumed that the first one is having a crush on the second one.
+
+Output Specification:
+
+For each query, first print in a line the number of different pairs of friends they can find to help them, then in each line print the IDs of a pair of friends.
+
+If the lovers A and B are of opposite genders, you must first print the friend of A who is of the same gender of A, then the friend of B, who is of the same gender of B. If they are of the same gender, then both friends must be in the same gender as theirs. It is guaranteed that each person has only one gender.
+
+The friends must be printed in non-decreasing order of the first IDs, and for the same first ones, in increasing order of the seconds ones.
+
+Sample Input:
+
+10 18-2001 1001-2002 -20011004 1001-2004 -2001-2003 10051005 -20011001 -20031002 10011002 -2004-2004 10011003 -2002-2003 10031004 -2002-2001 -20031001 10031003 -20011002 -2001-2002 -200351001 -2001-2003 10011005 -2001-2002 -20041111 -2003
+
+Sample Output:
+
+41002 20041003 20021003 20031004 200242001 10022001 10032002 10032002 1004012003 20010
+
+题意：给出n个人，m对朋友关系，如果A和B一见钟情，则需要找出A的同性朋友C，B的同性朋友D，若C和D是朋友，则满足给A和B传递消息的条件，给出q对一见钟情的A，B，让你输出所有符合以上条件的朋友对，注意按朋友id升序排列。
+
+思路：首先做邻接表，表示每个人的朋友，用数组gender[]保存每个人的性别，接下来，对于给定的A和B，逐个遍历A的朋友C和B的朋友D，如果C与A同性，D与B同性并且C和D是朋友则保存下来，最后输出所有满足条件的朋友对 ，为了保证按朋友id升序输出，可以对A，B的朋友按id升序排序。
+
+注意：①输入的数据有-0000，如果按整形读入，则会误判性别，因此需要按字符串读入数据。
+
+           ②注意如果A和B是朋友且为同性，则注意A的朋友会有B，B的朋友里会有A，要保证C不是A，D不是B，否则会输出错误答案。
+
+参考代码：
+--------------------- 
+#include<cstdio>
+#include<vector>
+#include<string>
+#include<cmath>
+#include<iostream>
+#include<algorithm>
+using namespace std;
+vector<int> adj[10000];
+int n,m,q,gender[10000];	//女生为0，男生为1
+struct node{
+	int fu,fv;
+	node(int u,int v):fu(u),fv(v){}
+};
+bool judge(int u,int v){	//判断给定的两个人是否是朋友关系
+	for(int i=0;i<adj[u].size();i++){
+		if(adj[u][i]==v)
+			return true;
+	}
+	return false;
+}
+int main()
+{
+	int u,v;
+	string a,b;
+	scanf("%d%d",&n,&m);
+	for(int i=0;i<m;i++){
+		cin>>a>>b;
+		u=abs(stoi(a));
+		v=abs(stoi(b));
+		if(a.size()==5) gender[u]=1;
+		if(b.size()==5) gender[v]=1;
+		adj[u].push_back(v);
+		adj[v].push_back(u);
+	}
+	scanf("%d",&q);
+	for(int k=0;k<q;k++){
+		scanf("%d%d",&u,&v);
+		u=abs(u);v=abs(v);
+		sort(adj[u].begin(),adj[u].end());
+		sort(adj[v].begin(),adj[v].end());
+		vector<node> ans;
+		for(int i=0;i<adj[u].size();i++){	//遍历u和v的每一对朋友看看是否是朋友关系
+			for(int j=0;j<adj[v].size();j++){
+				int fu=adj[u][i],fv=adj[v][j];
+				if(gender[u]==gender[fu]&&gender[v]==gender[fv]&&fu!=v&&fv!=u&&judge(fu,fv))	
+					ans.push_back(node(fu,fv));
+			}
+		}
+		printf("%d\n",ans.size());
+		for(int i=0;i<ans.size();i++)
+			printf("%04d %04d\n",ans[i].fu,ans[i].fv);
+	}
+	return 0;
+}
